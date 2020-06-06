@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  email: MyString
+  affiliation: MyString
+  employee_number: 1
+  uid: MyString
+  basic_work_time: 2020-06-06 00:12:47
+  designated_work_start_time: 2020-06-06 00:12:47
+  designated_work_end_time: 2020-06-06 00:12:47
+  superior: false
+  admin: false
+  password: MyString
+
+two:
+  name: MyString
+  email: MyString
+  affiliation: MyString
+  employee_number: 1
+  uid: MyString
+  basic_work_time: 2020-06-06 00:12:47
+  designated_work_start_time: 2020-06-06 00:12:47
+  designated_work_end_time: 2020-06-06 00:12:47
+  superior: false
+  admin: false
+  password: MyString

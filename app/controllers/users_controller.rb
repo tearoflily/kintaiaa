@@ -15,6 +15,7 @@ class UsersController < ApplicationController
 
   def update
     @user = User.find(params[:id])
+    @user.password_confirmation = @user.password
     if @user.update_attributes(user_params)
       flash[:success] = "ユーザー情報を更新しました"
       redirect_to users_url
@@ -27,6 +28,11 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     @user.destroy
     flash[:success] = "#{@user.name}削除が完了しました"
+    redirect_to users_url
+  end
+  
+  def import
+    User.import(params[:file])
     redirect_to users_url
   end
   

@@ -2,67 +2,80 @@
 
     <h1>ユーザー一覧画面</h1>
 
+<%= form_tag import_users_path, multipart: true do %>
+  <%= file_field_tag :file %>
+  <%= submit_tag "インポート" %>
+<% end %>
 
-<div class="panel-group" id="accordion">
+
 <% @users.each do |user| %>
+  <div id="user-index-table">
+    <p>
+      <%= user.name %>
+      <td>
+        <%= link_to "削除", user, method: :delete, data: {confirm: "削除してよろしいですか？" }, class: "btn btn-primary" %>
+      </td>
+    </p>
+    
+    <div class="panel-group" id="accordion">
+    
+    
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" href="#collapse<%= user.id %>" class="btn bg-primary btn-lg" id="user-index-table-btn">編集</a>
+          </h4>
+        </div>
+        <div id="collapse<%= user.id %>" class="panel-collapse collapse">
+          <div class="panel-body">
+            
+                
+          <div class="row">
+            <div class="col-md-6 col-md-offset-3 form-table" >
+     	      <%= form_with(model: user, local: true) do |f| %>  
+                <%= render 'shared/error_messages' %>
+          
+                <%= f.label :name, class: "label-user--edit" %>
+                <%= f.text_field :name, class: "form-control form-bottom-margin" %>
+          
+                <%= f.label :email, class: "label-user--edit" %>
+                <%= f.email_field :email, class: "form-control form-bottom-margin" %>
+                
+                <%= f.label :affiliation, class: "label-user--edit" %>
+                <%= f.text_field :affiliation, class: "form-control form-bottom-margin" %>
+                
+                <%= f.label :employee_number, class: "label-user--edit" %>
+                <%= f.number_field :employee_number, class: "form-control form-bottom-margin" %>
+                
+                <%= f.label :uid, class: "label-user--edit" %>
+                <%= f.text_field :uid, class: "form-control form-bottom-margin" %>
+          
+                <%= f.label :password, class: "label-user--edit" %>
+                <%= f.password_field :password, class: "form-control form-bottom-margin" %>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <a data-toggle="collapse" data-parent="#accordion" href="#collapse<%= user.id %>"><%= user.name %></a>
-      </h4>
-    </div>
-    <div id="collapse<%= user.id %>" class="panel-collapse collapse">
-      <div class="panel-body">
-        
-            
-      <div class="row">
-        <div class="col-md-6 col-md-offset-3">
- 	      <%= form_with(model: user, local: true) do |f| %>  
-            <%= render 'shared/error_messages' %>
-      
-            <%= f.label :name, class: "label-user--edit" %>
-            <%= f.text_field :name, class: "form-control" %>
-      
-            <%= f.label :email, class: "label-user--edit" %>
-            <%= f.email_field :email, class: "form-control" %>
-            
-            <%= f.label :affiliation, class: "label-user--edit" %>
-            <%= f.text_field :affiliation, class: "form-control" %>
-            
-            <%= f.label :employee_number, class: "label-user--edit" %>
-            <%= f.number_field :employee_number, class: "form-control" %>
-            
-            <%= f.label :uid, class: "label-user--edit" %>
-            <%= f.text_field :uid, class: "form-control" %>
-      
-            <%= f.label :password, class: "label-user--edit" %>
-            <%= f.password_field :password, class: "form-control" %>
-      
-            <%= f.label :password_confirmation, "Confirmation", class: "label-user--edit" %>
-            <%= f.password_field :password_confirmation, class: "form-control" %>
-            
-            <%= f.label :basic_work_time, class: "label-user--edit" %>
-            <%= f.time_field :basic_work_time, class: "form-control" %>
-            
-            <%= f.label :designated_work_start_time, class: "label-user--edit" %>
-            <%= f.time_field :designated_work_start_time, class: "form-control" %>
-            
-            <%= f.label :designated_work_end_time, class: "label-user--edit" %>
-            <%= f.time_field :designated_work_end_time, class: "form-control" %>
-      
-            <%= f.submit "更新", class: "btn btn-primary btn-block btn-user--edit" %>
-      	<% end %>
+                <%= f.label :basic_work_time, class: "label-user--edit" %>
+                <%= f.time_field :basic_work_time, class: "form-control form-bottom-margin" %>
+                
+                <%= f.label :designated_work_start_time, class: "label-user--edit" %>
+                <%= f.time_field :designated_work_start_time, class: "form-control form-bottom-margin" %>
+                
+                <%= f.label :designated_work_end_time, class: "label-user--edit" %>
+                <%= f.time_field :designated_work_end_time, class: "form-control form-bottom-margin" %>
+          
+                <%= f.submit "更新", class: "btn btn-primary btn-block btn-user--edit form-bottom-margin" %>
+          	<% end %>
+            </div>
+          </div>
+          
+           
+           
+          </div>
         </div>
       </div>
+    
       
-       
-       
-      </div>
+    
     </div>
   </div>
-
-  
 <% end %>
-</div>
 

@@ -30,6 +30,9 @@
 
 
 
+
+	
+	<%= link_to "勤怠編集", edit_user_attendance_path(id: current_user.id, date: @first_day) %>
 <table class="table table-bordered table-condensed table-hover" id="table-attendances">
 	<tbody>
 		<tr>
@@ -59,7 +62,7 @@
 			<th>分</th>
 		</tr>
 		
-		<% @attendances.each do |day| %>
+			<% @attendances.each do |day| %>
 			<td><%= l(day.worked_on, format: :short) %></td>
 			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
 			<td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>

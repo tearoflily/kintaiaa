@@ -98,3 +98,36 @@ p {
 .form-table{
   padding: 50px 0px;
 }
+
+
+.work_table , td, th {
+	border: 1px solid #595959;
+	border-collapse: collapse;
+}
+
+
+.label-login {
+  margin-top: 5px;
+}
+
+.btn-login {
+  margin-top: 10px;
+}
+
+.label-signup {
+  margin-top: 5px;
+}
+
+.btn-signup {
+  margin-top: 10px;
+}
+
+.user-table {
+  vertical-align: middle;
+  text-align: center;
+}
+
+#table-attendances th{
+  vertical-align: middle;
+  text-align: center; 
+}

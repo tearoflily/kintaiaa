@@ -1,0 +1,92 @@
+<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+	<tbody>
+		<tr>
+			<td rowspan="2">
+				
+				<%= link_to "前月へ", new_user_attendance_path(date: @first_day.prev_month), class:"btn btn-primary" %>
+				【 時間管理表 】
+				<%= link_to "次月へ", new_user_attendance_path(date: @first_day.next_month), class:"btn btn-primary" %>
+				
+				</td>
+			<td>指定勤務開始時間：<%= l(@user.designated_work_start_time, format: "%-H:%M") %></td>
+			<td colspan="3" rowspan="2">基本時間：<%= l(@user.basic_work_time, format: "%-H:%M") %></td>
+			<td rowspan="2">初日：<%= @first_day %></td>
+		</tr>
+		<tr>
+			<td>指定勤務終了時間：<%= l(@user.designated_work_end_time, format: "%-H:%M") %></td>
+		</tr>
+		<tr>
+			<td>所属：<%= @user.affiliation %></td>
+			<td>氏名：<%= @user.name %></td>
+			<td>コード</td>
+			<td>---</td>
+			<td>出勤日数</td>
+			<td>締め：<%= @first_day.end_of_month %></td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+
+
+<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+	<tbody>
+		<tr>
+			<th rowspan="3">日付</th>
+			<th rowspan="3">曜日</th>
+			<th colspan="8">【実績】</th>
+			<th colspan="5">所定勤務時間</th>
+		</tr>
+		<tr>
+			<th colspan="3">出社</th>
+			<th colspan="3">退社</th>
+			<th rowspan="2">在社時間</th>
+			<th rowspan="2">備考</th>
+			<th colspan="2">終了予定時間</th>
+			<th rowspan="2">時間外時間</th>
+			<th rowspan="2">業務処理内容</th>
+			<th rowspan="2">指示者確認印</th>
+		</tr>
+		<tr>
+			<th>時</th>
+			<th>分</th>
+			<th></th>
+			<th>時</th>
+			<th>分</th>
+			<th></th>
+			<th>時</th>
+			<th>分</th>
+		</tr>
+		
+		<% @attendances.each do |day| %>
+			<td><%= l(day.worked_on, format: :short) %></td>
+			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+			<td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>
+			<td><%= l(day.started_at, format: :minut) if day.started_at.present? %></td>
+			<td>
+				<% if (Date.current == day.worked_on) && day.started_at.nil? %>
+				<%= link_to "出勤登録", user_attendances_path(user_id: current_user, dayid: day.worked_on), method: :create %>
+				<% end %>
+				</td>
+			<td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
+			<td><%= l(day.finished_at, format: :minut) if day.finished_at.present? %></td>
+			<td>
+				<% if (Date.current == day.worked_on) && day.finished_at.nil? %>
+				<%= link_to "退勤登録", user_attendances_path(user_id: current_user, dayid: day.worked_on), method: :create %>
+				<% end %>
+				
+			</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	<% end %>
+	
+	
+	</tbody>
+</table>

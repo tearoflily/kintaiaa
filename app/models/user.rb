@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  has_many :attendances, dependent: :destroy
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, uniqueness: true
@@ -24,6 +25,10 @@ class User < ApplicationRecord
     "designated_work_start_time", "designated_work_end_time", "superior",
     "admin", "password"]
   end
-
+  
+  def authenticated?(remeber_token)
+    return false if remember_digest.nil?
+    BCrypt::Password.new(remeber_digest).is_password?(remer_token)
+  end
   
 end

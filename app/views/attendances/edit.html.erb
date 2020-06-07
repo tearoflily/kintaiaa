@@ -32,11 +32,19 @@
 
   			<td><%= attendance.time_select :finished_at if day.finished_at.present? %></td>
 
+  			<td>
+  				<%= f.check_box :tomorrow_finish, :as => :boolean %>
+  			</td>
   			<td></td>
-  			<td></td>
-  			<td></td>
-  			<td></td>
-  			<td></td>
+  			<td>
+  			  <%= attendance.text_field :note %>
+  			</td>
+  			
+  			<td>
+  				<%= f.select :consent, @consent.map { |person| [person.name, person.id]} %> 
+  			
+  			</td>
+
 
 			<% end %>
 		</tr>

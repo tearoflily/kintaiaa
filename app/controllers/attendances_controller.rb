@@ -14,21 +14,26 @@ class AttendancesController < ApplicationController
     if @attendance.started_at.nil? 
       if @attendance.update_attribute(:started_at, Time.current)
         flash[:success] = "出勤登録しました"
+        redirect_to new_user_attendance_path @user
       else
         flash[:danger] = "出勤登録失敗"
+        render :new
       end
     elsif @attendance.finished_at.nil?
       if @attendance.update_attribute(:finished_at, Time.current)
         flash[:success] = "おつかれさまでした"
-        redirect_to user_attendance_pathattendance
+        redirect_to new_user_attendance_path @user
       else
         flash[:danger] = "退勤登録失敗"
+        render :new
       end
     end
     
   end
   
   def edit
+    @consent = User.where(superior: true)
+    
   end
   
   def update

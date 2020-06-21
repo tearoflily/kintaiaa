@@ -26,15 +26,7 @@ class AttendancesController < ApplicationController
         redirect_to new_user_attendance_path @user
       else
         flash[:danger] = "退勤登録失敗"
-<<<<<<< HEAD
-
-        render:new
-
         render :new
-
-=======
-        render :new
->>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
       end
     end
     
@@ -44,14 +36,7 @@ class AttendancesController < ApplicationController
   
   def edit
     @consent = User.where(superior: true)
-<<<<<<< HEAD
-
-    @attendance_update = Attendance.new
-    @user = User.find(params[:user_id])
-
-=======
     
->>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
   end
   
 
@@ -100,6 +85,20 @@ class AttendancesController < ApplicationController
   end
   
   def update
+    update_edit_params.each do |id, item|
+      attendance = Attendance.find(id)
+      attendance.started_at = attendance.after_started_at
+      attendance.finished_at = attendance.after_finished_at
+
+      
+      debugger
+      attendance.save
+      
+       
+    end
+    
+    
+    
    
   end
  
@@ -117,7 +116,7 @@ class AttendancesController < ApplicationController
     end
     
     def update_edit_params
-      params.require(:user).permit(attendances: [:before_started_at, :before_finished_at, :after_started_at, :after_finished_at, :request_status])[:attendances]
+      params.require(:user).permit(attendances: [:request_type, :ok_flag])[:attendances]
     end
     
 

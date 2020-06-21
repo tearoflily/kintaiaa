@@ -48,15 +48,8 @@
 			</tr>
 	  	<% end %>
 		
-<<<<<<< HEAD
-		
-		</tbody>
-	</table>
-	
-	<div>
-=======
 		<% @attendances.each do |day| %>
-			<%= f.fields_for "attendances[]", day do |attendance| %>
+			<% f.fields_for "attendances[]", day do |attendance| %>
   			<td><%= l(day.worked_on, format: :short) %></td>
   			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
   			<td><% if day.started_at.present? %>
@@ -77,21 +70,14 @@
   				<%= f.select :consent, @consent.map { |person| [person.name, person.id]} %> 
   			
   			</td>
-<<<<<<< HEAD
-=======
+			<% end %>
 
->>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
+		<% end %>
 
->>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
-
-	  <%= f.submit "勤怠変更申請の確認画面へ移動するする", class:"btn btn-primary" %>
+		</tbody>
+	</table>
+		 <%= f.submit "勤怠変更申請の確認画面へ移動するする", class:"btn btn-primary" %>
 	  <%= link_to "キャンセル", '#' %>
-	</div>
-	
-	<div>
-
-	</div>
-	
 <% end %>
 
 

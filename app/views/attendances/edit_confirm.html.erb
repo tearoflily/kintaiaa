@@ -4,7 +4,7 @@
 	<% @users.each do |key,attendances| %>
 		
 		<table class="table table-bordered table-condensed table-hover" id="table-attendances">
-				<div><%= who_name(key).to_s %></div>
+				<div>変更 申請者：<%= who_name(key).to_s %></div>
 			<thead>
 				<tr>
 				<td rowspan="3">日付</td>
@@ -36,24 +36,26 @@
 			<tbody>
 				<tr>
 				<% attendances.each do |day| %>
-					<td><%= day.worked_on %></td>
-					<td><%= $days_of_the_week[day.worked_on.wday] %></td>
-					<td><%= day.before_started_at.hour %></td>
-					<td><%= day.before_started_at.min %></td>
-					<td><%= day.before_finished_at.hour %></td>
-					<td><%= day.before_finished_at.min %></td>
-					<td><%= day.after_started_at.hour %></td>
-					<td><%= day.after_started_at.min %></td>
-					<td><%= day.after_finished_at.hour %></td>
-					<td><%= day.after_finished_at.min %></td>
-					<td><%= day.note %></td>
-					<td><%= day.request_type %></td><!-- なし：nil　申請中:0　承認:1　否認:2 -->
-					<td>□</td>
-					<td>勤怠確認</td>
+					<%= form.fields_for "attendances[]", day do |atn| %>
+						<td><%= day.worked_on %></td>
+						<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+						<td><%= day.before_started_at.hour %></td>
+						<td><%= day.before_started_at.min %></td>
+						<td><%= day.before_finished_at.hour %></td>
+						<td><%= day.before_finished_at.min %></td>
+						<td><%= day.after_started_at.hour %></td>
+						<td><%= day.after_started_at.min %></td>
+						<td><%= day.after_finished_at.hour %></td>
+						<td><%= day.after_finished_at.min %></td>
+						<td><%= day.note %></td>
+						<td><%= atn.select :request_type, [['申請中', 0],['承認', 1],['否認', 2]], {selected: 0}, {} %></td><!--  なし：nil　申請中:0　承認:1　否認:2 -->
+						<td><%= atn.check_box :ok_flag %></td>
+						<td>勤怠確認</td>
+					<% end %>
 				<% end %>
 				</tr>
 			</tbody>
 		</table>
 	<% end %>
-
+	<%= form.submit %>
 <% end %>

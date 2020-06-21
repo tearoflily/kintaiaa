@@ -26,7 +26,11 @@ class AttendancesController < ApplicationController
         redirect_to new_user_attendance_path @user
       else
         flash[:danger] = "退勤登録失敗"
+
         render:new
+
+        render :new
+
       end
     end
     
@@ -36,8 +40,10 @@ class AttendancesController < ApplicationController
   
   def edit
     @consent = User.where(superior: true)
+
     @attendance_update = Attendance.new
     @user = User.find(params[:user_id])
+
   end
   
 
@@ -78,7 +84,6 @@ class AttendancesController < ApplicationController
     @users = {}
     @attendance_user_id.each do |user_id|
       @user = User.find_by(id: user_id)
-  
       @user_attendance = @user.attendances.where(who_consent: current_user.id).where(request_type: 1).to_a
       @users.merge!(user_id => @user_attendance)
     end

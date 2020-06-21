@@ -48,11 +48,37 @@
 			</tr>
 	  	<% end %>
 		
+<<<<<<< HEAD
 		
 		</tbody>
 	</table>
 	
 	<div>
+=======
+		<% @attendances.each do |day| %>
+			<%= f.fields_for "attendances[]", day do |attendance| %>
+  			<td><%= l(day.worked_on, format: :short) %></td>
+  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+  			<td><% if day.started_at.present? %>
+  			  <%= attendance.time_select :started_at, format: :minut  %>
+  			  <% end %></td>
+
+  			<td><%= attendance.time_select :finished_at if day.finished_at.present? %></td>
+
+  			<td>
+  				<%= f.check_box :tomorrow_finish, :as => :boolean %>
+  			</td>
+  			<td></td>
+  			<td>
+  			  <%= attendance.text_field :note %>
+  			</td>
+  			
+  			<td>
+  				<%= f.select :consent, @consent.map { |person| [person.name, person.id]} %> 
+  			
+  			</td>
+
+>>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
 
 	  <%= f.submit "勤怠変更申請の確認画面へ移動するする", class:"btn btn-primary" %>
 	  <%= link_to "キャンセル", '#' %>

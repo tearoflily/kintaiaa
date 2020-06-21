@@ -4,10 +4,15 @@
     <nav>
       <ul class="nav navbar-nav navbar-right">
         <li><%= link_to "Top", root_path %></li>
+        <% if current_user %>
         <li><%= link_to "ユーザー一覧", users_path %></li>
+<<<<<<< HEAD
         <% if current_user %>
         
         
+=======
+        
+>>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
           <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user) %></li>
         <% end %>
   

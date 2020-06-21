@@ -61,6 +61,10 @@ ja:
     - :month
     - :day
   datetime:
+    formats:
+      short: "%H：%M"
+      hour: "%H"
+      minut: "%M"
     distance_in_words:
       about_x_hours:
         one: 約1時間

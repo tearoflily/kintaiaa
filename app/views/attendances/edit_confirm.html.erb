@@ -1,0 +1,59 @@
+<%= form_with model: @user, url:user_attendances_path(current_user), local: true do |form| %>
+
+			
+	<% @users.each do |key,attendances| %>
+		
+		<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+				<div><%= who_name(key).to_s %></div>
+			<thead>
+				<tr>
+				<td rowspan="3">日付</td>
+				<td rowspan="3">曜日</td>
+				<td colspan="4">変更前</td>
+				<td colspan="4">変更後</td>
+				<td rowspan="3">備考</td>
+				<td rowspan="3">指示者確認印</td>
+				<td rowspan="3">変更</td>
+				<td rowspan="3">勤怠を確認する</td>
+				</tr>
+				<tr>
+					<td colspan="2">出社</td>
+					<td colspan="2">退社</td>
+					<td colspan="2">出社</td>
+					<td colspan="2">退社</td>
+				</tr>
+				<tr>
+					<td>時</td>
+					<td>分</td>
+					<td>時</td>
+					<td>分</td>
+					<td>時</td>
+					<td>分</td>
+					<td>時</td>
+					<td>分</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+				<% attendances.each do |day| %>
+					<td><%= day.worked_on %></td>
+					<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+					<td><%= day.before_started_at.hour %></td>
+					<td><%= day.before_started_at.min %></td>
+					<td><%= day.before_finished_at.hour %></td>
+					<td><%= day.before_finished_at.min %></td>
+					<td><%= day.after_started_at.hour %></td>
+					<td><%= day.after_started_at.min %></td>
+					<td><%= day.after_finished_at.hour %></td>
+					<td><%= day.after_finished_at.min %></td>
+					<td><%= day.note %></td>
+					<td><%= day.request_type %></td><!-- なし：nil　申請中:0　承認:1　否認:2 -->
+					<td>□</td>
+					<td>勤怠確認</td>
+				<% end %>
+				</tr>
+			</tbody>
+		</table>
+	<% end %>
+
+<% end %>

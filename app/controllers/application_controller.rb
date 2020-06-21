@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
         @user.attendances.create!(worked_on: day)
         end
       end
-      @attendances = @user.attendances.where(*@first_day..@last_day).order(:worked_on)
+      @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
     end
     
   rescue ActiveRecord::RecordInvalid

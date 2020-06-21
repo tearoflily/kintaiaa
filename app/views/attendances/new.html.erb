@@ -3,9 +3,9 @@
 		<tr>
 			<td rowspan="2">
 				
-				<%= link_to "前月へ", new_user_attendance_path(date: @first_day.prev_month), class:"btn btn-primary" %>
+				<%= link_to "前月へ", new_user_attendance_path(date: @first_day.to_date.prev_month), class:"btn btn-primary" %>
 				【 時間管理表 】
-				<%= link_to "次月へ", new_user_attendance_path(date: @first_day.next_month), class:"btn btn-primary" %>
+				<%= link_to "次月へ", new_user_attendance_path(date: @first_day.to_date.next_month), class:"btn btn-primary" %>
 				
 				</td>
 			<td>指定勤務開始時間：<%= l(@user.designated_work_start_time, format: "%-H:%M") %></td>
@@ -26,13 +26,17 @@
 	</tbody>
 </table>
 
+【所属長承認申請のお知らせ】
+
+<%= link_to "【勤怠変更申請のお知らせ】 ", edit_confirm_user_attendances_path(@user.id) %>
 
 
 
+【残業申請のお知らせ】
 
 
 	
-	<%= link_to "勤怠編集", edit_user_attendance_path(id: current_user.id, date: @first_day) %>
+	<%= link_to "勤怠編集", user_attendances_edit_path(user_id: @user.id, date: @first_day) %>
 <table class="table table-bordered table-condensed table-hover" id="table-attendances">
 	<tbody>
 		<tr>
@@ -69,14 +73,14 @@
 			<td><%= l(day.started_at, format: :minut) if day.started_at.present? %></td>
 			<td>
 				<% if (Date.current == day.worked_on) && day.started_at.nil? %>
-				<%= link_to "出勤登録", user_attendances_path(user_id: current_user, dayid: day.worked_on), method: :create %>
+				<%= link_to "出勤登録", user_attendances_path(user_id: params[:user_id], dayid: day.worked_on), method: :create %>
 				<% end %>
 				</td>
 			<td><%= l(day.finished_at, format: :hour) if day.finished_at.present? %></td>
 			<td><%= l(day.finished_at, format: :minut) if day.finished_at.present? %></td>
 			<td>
 				<% if (Date.current == day.worked_on) && day.finished_at.nil? %>
-				<%= link_to "退勤登録", user_attendances_path(user_id: current_user, dayid: day.worked_on), method: :create %>
+				<%= link_to "退勤登録", user_attendances_path(user_id: params[:user_id], dayid: day.worked_on), method: :create %>
 				<% end %>
 				
 			</td>

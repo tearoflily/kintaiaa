@@ -45,6 +45,7 @@ class UsersController < ApplicationController
       params.require(:user).permit(:name, :email, :affiliation, :employee_number, :uid, :basic_work_time, 
                                     :designated_work_start_time, :designated_work_end_time, :password, :password_confirmation)
     end
+    
   
   
 end

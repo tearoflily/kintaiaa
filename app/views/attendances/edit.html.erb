@@ -1,54 +1,67 @@
 
-<%= form_with(model: @user, url:user_attendance_path(id: params[:user_id], date: params[:date]), local: true, method: :patch) do |f| %>
-氏名：<%= @user.name %>
 
-
-
-
-<table class="table table-bordered table-condensed table-hover" id="table-attendances">
-	<tbody>
-
-		<tr>
-		  <th colspan="1">日付</th>
-			<th colspan="1">曜日</th>
-			<th colspan="1">出社</th>
-			<th colspan="1">退社</th>
-			<th colspan="1">翌日</th>
-			<th colspan="1">在社時間</th>
-			<th colspan="1">備考</th>
-			
-
-			<th colspan="1">指示者確認印</th>
-		</tr>
-
+<%= form_with(model: @user, url: update_waiting_user_attendances_path(@user.id), local: true, method: :post) do |f| %>
+	氏名：<%= @user.name %>
+	
+	<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+		<thead>
+			<tr>
+			  <th colspan="1">日付</th>
+				<th colspan="1">曜日</th>
+				<th colspan="1">出社</th>
+				<th colspan="1">退社</th>
+				<th colspan="1">翌日</th>
+				<th colspan="1">在社時間</th>
+				<th colspan="1">備考</th>
+				<th colspan="1">指示者確認印</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% @attendances.each do |day| %>
+				<%= f.fields_for "attendances[]", day do |attendance| %>
+				
+	  			<td><%= l(day.worked_on, format: :short) %></td>
+	  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+	  			<td><% if day.started_at.present? %>
+	  			  <%= attendance.time_select :after_started_at, selected: day.started_at %>
+	  			  <% end %></td>
+	
+	  			<td><%= attendance.time_select :after_finished_at, selected: day.finished_at if day.finished_at.present? %></td>
+	
+	  			<td>
+	  			
+	  			<%= attendance.check_box :tommorow_flag %>
+	  
+	  			</td>
+	  			<td></td>
+	  			<td>
+	  			  <%= attendance.text_field :note %>
+	  			</td>
+	  			
+	  			<td>
+	  				<%= attendance.select :who_consent, @consent.map { |person| [person.name, person.id]} %> 
+	  			
+	  			</td>
+	
+	
+				<% end %>
+			</tr>
+	  	<% end %>
 		
-		<% @attendances.each do |day| %>
-			<%= f.fields_for "attendances[]", day do |attendance| %>
-  			<td><%= l(day.worked_on, format: :short) %></td>
-  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
-  			<td><% if day.started_at.present? %>
-  			  <%= attendance.time_select :started_at, format: :minut  %>
-  			  <% end %></td>
-
-  			<td><%= attendance.time_select :finished_at if day.finished_at.present? %></td>
-
-  			<td></td>
-  			<td></td>
-  			<td></td>
-  			<td></td>
-  			<td></td>
-
-			<% end %>
-		</tr>
-  	<% end %>
+		
+		</tbody>
+	</table>
 	
+	<div>
+
+	  <%= f.submit "勤怠変更申請の確認画面へ移動するする", class:"btn btn-primary" %>
+	  <%= link_to "キャンセル", '#' %>
+	</div>
 	
-	</tbody>
-</table>
+	<div>
 
-<div>
-  <%= f.submit "まとめて更新" %>
-  <%= link_to "キャンセル", '#' %>
-</div>
-
+	</div>
+	
 <% end %>
+
+

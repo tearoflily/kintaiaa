@@ -15,9 +15,20 @@ Rails.application.routes.draw do
   resources :users do
     collection { post :import }
     member do
-  
+      
     end
-    resources :attendances
+    get 'attendances/edit'
+    resources :attendances do
+      collection { patch :edit_confirmation
+                   post :update_waiting
+                   get :edit_confirm
+                  patch :update
+      }
+      member do
+        
+        
+      end
+    end
   end
   
 

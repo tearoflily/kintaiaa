@@ -11,7 +11,11 @@
 # It's strongly recommended that you check this file into your version control system.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20200610080121) do
+=======
+ActiveRecord::Schema.define(version: 20200607101054) do
+>>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
 =======
 ActiveRecord::Schema.define(version: 20200607101054) do
 >>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
@@ -56,6 +60,9 @@ ActiveRecord::Schema.define(version: 20200607101054) do
     t.datetime "designated_work_start_time", default: "2020-06-05 23:30:00"
     t.datetime "designated_work_end_time", default: "2020-06-06 08:30:00"
     t.boolean "superior", default: false
+<<<<<<< HEAD
+>>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
+=======
 >>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
     t.boolean "admin", default: false
     t.string "password"

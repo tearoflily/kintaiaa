@@ -26,11 +26,15 @@ class AttendancesController < ApplicationController
         redirect_to new_user_attendance_path @user
       else
         flash[:danger] = "退勤登録失敗"
+<<<<<<< HEAD
 
         render:new
 
         render :new
 
+=======
+        render :new
+>>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
       end
     end
     
@@ -40,10 +44,14 @@ class AttendancesController < ApplicationController
   
   def edit
     @consent = User.where(superior: true)
+<<<<<<< HEAD
 
     @attendance_update = Attendance.new
     @user = User.find(params[:user_id])
 
+=======
+    
+>>>>>>> 840b6eec328dc5223b30bb0465c83a03c4833eee
   end
   
 

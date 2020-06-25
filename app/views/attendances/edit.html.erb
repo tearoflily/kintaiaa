@@ -19,61 +19,34 @@
 		<tbody>
 			<% @attendances.each do |day| %>
 				<%= f.fields_for "attendances[]", day do |attendance| %>
-				
-	  			<td><%= l(day.worked_on, format: :short) %></td>
-	  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
-	  			<td><% if day.started_at.present? %>
-	  			  <%= attendance.time_select :after_started_at, selected: day.started_at %>
-	  			  <% end %></td>
-	
-	  			<td><%= attendance.time_select :after_finished_at, selected: day.finished_at if day.finished_at.present? %></td>
-	
-	  			<td>
-	  			
-	  			<%= attendance.check_box :tommorow_flag %>
-	  
-	  			</td>
-	  			<td></td>
-	  			<td>
-	  			  <%= attendance.text_field :note %>
-	  			</td>
-	  			
-	  			<td>
-	  				<%= attendance.select :who_consent, @consent.map { |person| [person.name, person.id]} %> 
-	  			
-	  			</td>
-	
-	
+					<% if day.only_day == 1 %>
+		  			<td><%= l(day.worked_on, format: :short) %></td>
+		  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+		  			<td><%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true , selected: day.started_at, include_blank: true } %></td>
+		
+		  			<td><%= attendance.datetime_select :after_finished_at, { :discard_year => true,  :discard_month => true, :discard_day => true , selected: day.finished_at, include_blank: true } %></td>
+		
+		  			<td>
+		  			
+		  			<%= attendance.check_box :tommorow_flag %>
+		  
+		  			</td>
+		  			<td></td>
+		  			<td>
+		  			  <%= attendance.text_field :note %>
+		  			</td>
+		  			
+		  			<td>
+		  				<%= attendance.collection_select :who_consent, User.where(superior: true), :id, :name, {include_blank: '選択してください' }, :prompt => true %> 
+		  			
+		  			</td>
+		
+					<% end %>
 				<% end %>
 			</tr>
 	  	<% end %>
 		
-		<% @attendances.each do |day| %>
-			<% f.fields_for "attendances[]", day do |attendance| %>
-  			<td><%= l(day.worked_on, format: :short) %></td>
-  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
-  			<td><% if day.started_at.present? %>
-  			  <%= attendance.time_select :started_at, format: :minut  %>
-  			  <% end %></td>
-
-  			<td><%= attendance.time_select :finished_at if day.finished_at.present? %></td>
-
-  			<td>
-  				<%= f.check_box :tomorrow_finish, :as => :boolean %>
-  			</td>
-  			<td></td>
-  			<td>
-  			  <%= attendance.text_field :note %>
-  			</td>
-  			
-  			<td>
-  				<%= f.select :consent, @consent.map { |person| [person.name, person.id]} %> 
-  			
-  			</td>
-			<% end %>
-
-		<% end %>
-
+		
 		</tbody>
 	</table>
 		 <%= f.submit "勤怠変更申請の確認画面へ移動するする", class:"btn btn-primary" %>

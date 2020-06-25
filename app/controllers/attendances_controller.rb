@@ -35,8 +35,8 @@ class AttendancesController < ApplicationController
 
   
   def edit
-    @consent = User.where(superior: true)
-    
+   
+    @attendance = @user.attendances.find_by(user_id: current_user.id)
   end
   
 
@@ -45,12 +45,17 @@ class AttendancesController < ApplicationController
   
   def update_waiting
     @user = User.find(params[:user_id])
+    
+   
+    
     attendance_edit_params.each do |id, item|
+     
       attendance = Attendance.find(id)
-      if item["after_started_at(1i)"].present?
+     
         item[:after_started_at] = DateTime.new(item["after_started_at(1i)"].to_i, item["after_started_at(2i)"].to_i, item["after_started_at(3i)"].to_i, item["after_started_at(4i)"].to_i, item["after_started_at(5i)"].to_i)
         item[:after_finished_at] = DateTime.new(item["after_finished_at(1i)"].to_i, item["after_finished_at(2i)"].to_i, item["after_finished_at(3i)"].to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
       
+      unless attendance.started_at == item[:after_started_at] 
 
         item[:request_at] = Time.current
        
@@ -70,6 +75,7 @@ class AttendancesController < ApplicationController
   
   
   def edit_confirm
+   
     @attendance = Attendance.where(who_consent: current_user.id)
     @attendance_user_id = @attendance.pluck(:user_id)
     @user = User.new
@@ -77,7 +83,8 @@ class AttendancesController < ApplicationController
     @users = {}
     @attendance_user_id.each do |user_id|
       @user = User.find_by(id: user_id)
-      @user_attendance = @user.attendances.where(who_consent: current_user.id).where(request_type: 1).to_a
+      @user_attendance = @user.attendances.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 1).to_a
+      
       @users.merge!(user_id => @user_attendance)
     end
  
@@ -86,20 +93,50 @@ class AttendancesController < ApplicationController
   
   def update
     update_edit_params.each do |id, item|
-      attendance = Attendance.find(id)
-      attendance.started_at = attendance.after_started_at
-      attendance.finished_at = attendance.after_finished_at
 
-      
-      debugger
-      attendance.save
-      
-       
+        if item[:ok_flag] == "1" && item[:request_status] == "1"
+  
+          attendance = Attendance.find_by(id: id)
+          @user = User.find_by(id: attendance.user_id)
+          @new_attendance = @user.attendances.new
+
+          @new_attendance.started_at = attendance.after_started_at
+          @new_attendance.finished_at = attendance.after_finished_at
+          @new_attendance.before_started_at = attendance.before_started_at
+          @new_attendance.before_finished_at = attendance.before_finished_at
+          @new_attendance.who_consent = attendance.who_consent
+          @new_attendance.request_at = DateTime.current
+          @new_attendance.worked_on = item[:worked_on]
+          @new_attendance.note = attendance.note
+          @new_attendance.request_type = attendance.request_type
+          @new_attendance.request_status = 1
+          @new_attendance.tommorow_flag = attendance.tommorow_flag
+          @new_attendance.only_day = 1
+          
+          attendance.after_started_at = nil
+          attendance.after_finished_at = nil
+          attendance.before_started_at = nil
+          attendance.before_finished_at = nil
+          attendance.who_consent = nil
+          attendance.request_at = nil
+          attendance.request_type = nil
+          attendance.only_day = nil
+          attendance.request_status = nil
+          
+          attendance.save!
+          @new_attendance.save!
+        end
+     
     end
+  end
+  
+  def log
+    @user = User.find(current_user.id)
+  
+    @attendance = @user.attendances.order(:created_at).where("(request_status = ?)", 1)
     
+    # https://teratail.com/questions/214779
     
-    
-   
   end
  
  
@@ -116,7 +153,7 @@ class AttendancesController < ApplicationController
     end
     
     def update_edit_params
-      params.require(:user).permit(attendances: [:request_type, :ok_flag])[:attendances]
+      params.require(:user).permit(attendances: [:worked_on, :request_status, :ok_flag])[:attendances]
     end
     
 

@@ -1,0 +1,28 @@
+
+    
+    
+<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+	<tbody>
+		<tr>
+			<th>日付</th>
+			<th>変更前出社時間</th>
+			<th>変更前退社時間</th>
+			<th>変更後出社時間</th>
+			<th>変更後退社時間</th>
+			<th>指示者</th>
+			<th>承認日</th>
+		</tr>
+		
+		<% @attendance.each do |attendance| %>
+		  <tr>
+  			<td><%= attendance.worked_on %></td>
+  			<td><%= attendance.before_started_at %></td>
+  			<td><%= attendance.before_finished_at %></td>
+  			<td><%= attendance.started_at %></td>
+  			<td><%= attendance.finished_at %></td>
+  			<td><%= attendance.who_consent %></td>
+  			<td><%= attendance.request_at %></td>
+		  </tr>
+		<% end %>
+	</tbody>
+</table>

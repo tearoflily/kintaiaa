@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       collection { patch :edit_confirmation
                    post :update_waiting
                    get :edit_confirm
+                   get :log
                   patch :update
       }
       member do

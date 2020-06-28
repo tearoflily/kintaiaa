@@ -8,7 +8,7 @@
         
         <li><%= link_to "ユーザー一覧", users_path %></li>
         <% if current_user %>
-        <li><%= link_to "勤怠ログ", log_user_attendances_path(current_user) %></li>
+        <li><%= link_to "勤怠ログ", attendance_log_user_attendances_path(current_user) %></li>
           <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user) %></li>
         <% end %>
   

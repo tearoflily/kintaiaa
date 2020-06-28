@@ -39,6 +39,7 @@
 				<tr>
 					<%= form.fields_for "attendances[]", day do |atn| %>
 						<% if day.after_started_at.present? %>
+						
 							<td><%= atn.text_field :worked_on, readonly:true, style: "border: none" %></td>
 							<td><%= $days_of_the_week[day.worked_on.wday] %></td>
 							<td><%= day.before_started_at.hour if day.before_started_at.present? %></td>

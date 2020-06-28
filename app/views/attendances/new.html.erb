@@ -27,12 +27,12 @@
 </table>
 
 【所属長承認申請のお知らせ】
-
 <%= link_to "【勤怠変更申請のお知らせ】 ", edit_confirm_user_attendances_path(@user.id) %>
+<%= link_to "【残業申請のお知らせ】", overwork_confirm_user_attendances_path(@user.id) %>
 
 
 
-【残業申請のお知らせ】
+
 
 
 	
@@ -40,6 +40,7 @@
 <table class="table table-bordered table-condensed table-hover" id="table-attendances">
 	<tbody>
 		<tr>
+			<th rowspan="3">残業申請</th>
 			<th rowspan="3">日付</th>
 			<th rowspan="3">曜日</th>
 			<th colspan="8">【実績】</th>
@@ -68,6 +69,8 @@
 		
 	<% @attendances.each do |day| %>
 			<% if day.only_day == 1 %>
+			
+					<td><%= link_to '残業申請', overwork_user_attendance_path(current_user.id,day.id), class:"btn btn-primary" %></td>
 					<td><%= l(day.worked_on, format: :short) %></td>
 					<td><%= $days_of_the_week[day.worked_on.wday] %></td>
 					<td><%= l(day.started_at, format: :hour) if day.started_at.present? %></td>

@@ -211,4 +211,5 @@ ja:
       time: "%H：%M"
       hour: "%H"
       minut: "%M"
+      long_2: "%Y-%m-%d"
     pm: 午後

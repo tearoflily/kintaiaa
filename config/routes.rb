@@ -22,12 +22,15 @@ Rails.application.routes.draw do
       collection { patch :edit_confirmation
                    post :update_waiting
                    get :edit_confirm
-                   get :log
-                  patch :update
+                   get :attendance_log
+                   
+                   post :overwork_confirm_update
+                   get :overwork_confirm
+                   patch :update
       }
       member do
-        
-        
+        get :overwork
+        post :overwork_update
       end
     end
   end

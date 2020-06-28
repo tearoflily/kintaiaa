@@ -1,0 +1,34 @@
+<%= form_tag(attendance_log_user_attendances_path(current_user), method: :get)  do %>
+
+	<%= date_select("worked_on_between","date",{:discard_day => true, :default => @attendance_default}) %>
+	<%= submit_tag "検索" %>
+<% end %>
+
+<% if @attendance %>
+
+<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+	<tbody>
+		<tr>
+			<th>日付</th>
+			<th>変更前出社時間</th>
+			<th>変更前退社時間</th>
+			<th>変更後出社時間</th>
+			<th>変更後退社時間</th>
+			<th>指示者</th>
+			<th>承認日</th>
+		</tr>
+		
+		<% @attendance.each do |attendance| %>
+		  <tr>
+  			<td><%= attendance.worked_on %></td>
+  			<td><%= l(attendance.before_started_at, format: :time) if attendance.before_started_at.present? %></td>
+  			<td><%= l(attendance.before_finished_at, format: :time) if attendance.before_finished_at.present? %></td>
+  			<td><%= l(attendance.started_at, format: :time)  %></td>
+  			<td><%= l(attendance.finished_at, format: :time)  %></td>
+  			<td><%= attendance.who_consent %></td>
+  			<td><%= l(attendance.request_at, format: :long_2) %></td>
+		  </tr>
+		<% end %>
+	</tbody>
+</table>
+<% end %>

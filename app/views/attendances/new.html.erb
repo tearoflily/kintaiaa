@@ -26,7 +26,7 @@
 	</tbody>
 </table>
 
-【所属長承認申請のお知らせ】
+<%= link_to "【所属長承認申請のお知らせ】", month_confirmation_user_attendances_path(@user.id) %>
 <%= link_to "【勤怠変更申請のお知らせ】 ", edit_confirm_user_attendances_path(@user.id) %>
 <%= link_to "【残業申請のお知らせ】", overwork_confirm_user_attendances_path(@user.id) %>
 
@@ -97,8 +97,22 @@
 					<td></td>
 				<% end %>
 		</tr>
+
 	<% end %>
-	
+		<tr>
+			<td></td>
+			<td colspan="2"></td>
+			<td colspan="6"></td>
+			<td></td>
+			<td colspan="5"></td>
+			<td>
+				<%= form_with(model: @attendance_month_work, url: user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
+					<div>所属長承認</div>
+					<div><%= f.collection_select :month_work_who_consent, User.where(superior: true), :id, :name, {include_blank: '選択' }, :prompt => true %> </div>
+					<div><%= f.submit "申請", class:"btn btn-primary" %></div>
+				<% end %>
+			</td>
+		</tr>
 	
 	</tbody>
 </table>

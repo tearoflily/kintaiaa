@@ -5,13 +5,31 @@ class AttendancesController < ApplicationController
 
   def new
    @user = User.find(params[:user_id])
+   @attendance_month_work = @user.attendances.new
   end
   
   def create
     @user = User.find(params[:user_id])
     @today = Date.current
     @attendance = @user.attendances.find_by(worked_on: params[:dayid])
- 
+    
+    unless params[:attendance][:month_work_who_consent].nil?
+      @user = User.find(params[:user_id])
+      first_day = params[:dayid]
+      @first_day = first_day.to_date
+       
+      @last_day = @first_day.end_of_month
+      @attendance_month = @user.attendances.where(worked_on: @first_day..@last_day)
+      
+      @attendance_month.each do |item|
+        attendance = Attendance.find_by(id: item.id)
+        attendance[:month_work_who_consent] = params[:attendance][:month_work_who_consent]
+        attendance.month_work = 0
+      
+        attendance.save
+      end
+    end 
+      
     if @attendance.started_at.nil? 
       if @attendance.update_attribute(:started_at, Time.current)
         flash[:success] = "出勤登録しました"
@@ -20,6 +38,7 @@ class AttendancesController < ApplicationController
         flash[:danger] = "出勤登録失敗"
         render :new
       end
+      
     elsif @attendance.finished_at.nil?
       if @attendance.update_attribute(:finished_at, Time.current)
         flash[:success] = "おつかれさまでした"
@@ -28,6 +47,7 @@ class AttendancesController < ApplicationController
         flash[:danger] = "退勤登録失敗"
         render :new
       end
+    
     end
     
   end
@@ -173,6 +193,7 @@ class AttendancesController < ApplicationController
     attendance.request_type = 2
     attendance.request_status = "0"
     attendance.before_finished_at = attendance.finished_at
+    attendance.before_started_at = attendance.started_at
     
     if attendance.save
       flash[:success] = "残業申請を送信しました"
@@ -200,7 +221,90 @@ class AttendancesController < ApplicationController
   end
   
   def overwork_confirm_update
-  end  
+    
+    update_overwork_edit_params.each do |id, item|
+          attendance = Attendance.find_by(id: id)
+          @user = User.find_by(id: attendance.user_id)
+
+          
+        if item[:request_status] == "1"
+
+          @new_attendance = @user.attendances.new
+  
+          @new_attendance.started_at = attendance.before_started_at
+          @new_attendance.finished_at = attendance.after_finished_at
+          @new_attendance.who_consent = attendance.who_consent
+          @new_attendance.worked_on = attendance[:worked_on]
+          @new_attendance.note = attendance.note
+          @new_attendance.request_type = attendance.request_type
+          @new_attendance.request_status = 1
+          @new_attendance.tommorow_flag = attendance.tommorow_flag
+          @new_attendance.only_day = 1
+          
+          attendance.after_started_at = nil
+          attendance.after_finished_at = nil
+          attendance.before_started_at = nil
+          attendance.before_finished_at = nil
+          attendance.who_consent = nil
+          attendance.request_at = nil
+          attendance.request_type = nil
+          attendance.only_day = nil
+          attendance.request_status = nil
+          
+   
+          attendance.save!
+  
+          if @new_attendance.save!
+            flash.now[:success] = "勤怠情報の変更が完了しました"
+           
+          end
+            flash.now[:danger] = "勤怠情報の変更が完了していません。"
+        elsif item[:request_status] == "2"
+
+          attendance.after_started_at = nil
+          attendance.after_finished_at = nil
+          attendance.before_started_at = nil
+          attendance.before_finished_at = nil
+          attendance.request_at = nil
+          attendance.request_type = nil
+          attendance.only_day = nil
+          attendance.request_status = 2
+          attendance.request_status = 1
+          attendance.save!
+        end
+     
+    end
+  end
+  
+  def month_confirmation
+      @attendance_month = Attendance.where(month_work_who_consent: current_user.id).where(month_work: 0)
+      @attendance_user_id = @attendance_month.pluck(:user_id)
+      @user = User.new
+     
+      @users = {}
+      @attendance_user_id.each do |user|
+        @user = User.find_by(id: user)
+        @user_attendance = @user.attendances.where(month_work_who_consent: current_user.id).where(month_work: 0).first
+
+        
+        @users.merge!(user => @user_attendance)
+      end
+  end
+  
+  def month_confirmation_update
+  
+    
+    update_overwork_edit_params.each do |key, attendance|
+      debugger
+      @attendance_month = Attendance.find_by(id: key)
+      @user = User.find_by(id: @attendance_month.user_id)
+      @month = @attendance_month.worked_on・・・年月だけに変換する。次の行で月初から月末の範囲取得。whereで取得。eachでmonth系のカラムを更新。
+      
+    
+    end
+    
+
+  end
   
  
 
@@ -226,6 +330,14 @@ class AttendancesController < ApplicationController
       params.permit(:after_finished_at, :tommorow_flag, :note, :who_consent)
     end
     
+    def update_overwork_edit_params
+      params.require(:user).permit(attendances: [:worked_on, :after_finished_at, :request_status])[:attendances]
+    end
+    
+    def update_overwork_edit_params
+      params.require(:user).permit(attendances: [:month, :month_work, :ok_flag])[:attendances]
+    end
+
 
   
 end

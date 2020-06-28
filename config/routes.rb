@@ -27,6 +27,8 @@ Rails.application.routes.draw do
                    post :overwork_confirm_update
                    get :overwork_confirm
                    patch :update
+                   get :month_confirmation
+                   post :month_confirmation_update
       }
       member do
         get :overwork

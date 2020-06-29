@@ -168,7 +168,7 @@ class AttendancesController < ApplicationController
         @search_date = Time.new(params[:worked_on_between][:"date(1i)"].to_i, params[:worked_on_between][:"date(2i)"].to_i, params[:worked_on_between][:"date(3i)"].to_i)
       end
     
-    @attendance = @user.attendances.order(:created_at).where("(request_status = ?)", 1).search(@search_date)
+    @attendance = @user.attendances.order(:created_at).where("request_type = ?", 1).where("(request_status = ?)", 1).search(@search_date)
    
     @attendance_default = @attendance.pluck(:worked_on).first
     
@@ -294,11 +294,25 @@ class AttendancesController < ApplicationController
   def month_confirmation_update
   
     
-    update_overwork_edit_params.each do |key, attendance|
-      debugger
-      @attendance_month = Attendance.find_by(id: key)
-      @user = User.find_by(id: @attendance_month.user_id)
-      @month = @attendance_month.worked_on・・・年月だけに変換する。次の行で月初から月末の範囲取得。whereで取得。eachでmonth系のカラムを更新。
+    update_overwork_edit_params.each do |key, item|
+     
+      
+      if item[:month_work] == "1" && item[:ok_flag] == "1"
+        @attendance_month = Attendance.find_by(id: key)
+        @user = User.find_by(id: @attendance_month.user_id)
+        @month_start = @attendance_month.worked_on.beginning_of_month
+        @month_end = @month_start.end_of_month
+        @month = @user.attendances.where(worked_on: @month_start..@month_end)
+        @month.each do | day |
+          
+          attendance = Attendance.find(day.id)
+          
+          attendance.month_work = 1
+          
+          attendance.save
+          
+        end
+      end
       
     
     end
@@ -306,7 +320,6 @@ class AttendancesController < ApplicationController
 
   end
   
- 
 
  
  

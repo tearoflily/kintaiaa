@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#create'
   delete '/logout', to: 'sessions#destroy'
 
-
+  resources :bases
 
   
   resources :users do
@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       
     end
     get 'attendances/edit'
+ 
     resources :attendances do
       collection { patch :edit_confirmation
                    post :update_waiting

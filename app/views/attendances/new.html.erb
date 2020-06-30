@@ -109,7 +109,7 @@
 
 				
 				<% if @attendances.first.month_work == 0 %>
-						<%= form_with(model: @attendance_month_work, url: user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
+						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
 							<div>所属長承認</div>
 							<div><%= f.collection_select :month_work_who_consent, User.where(superior: true), :id, :name, {include_blank: '選択' }, :prompt => true %> </div>
 							<div><%= f.submit "申請", class:"btn btn-primary" %></div>

@@ -10,7 +10,8 @@ Rails.application.routes.draw do
   delete '/logout', to: 'sessions#destroy'
 
   resources :bases
-
+  
+  get '/working_now', to: 'attendances#working_now'
   
   resources :users do
     collection { post :import }
@@ -29,7 +30,8 @@ Rails.application.routes.draw do
                    get :overwork_confirm
                    patch :update
                    get :month_confirmation
-                   post :month_confirmation_update
+                   patch :month_confirmation_update
+                   post :month_confirmation_create
       }
       member do
         get :overwork

@@ -1,0 +1,21 @@
+<%= form_with model: @base do |form| %>
+          <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+            <tr>
+              <th><%= form.label :base_number, '拠点番号' %></th>
+              <td><%= form.text_field :base_number %></td>
+            </tr>
+            
+            <tr>
+              <th><%= form.label :base_name, '拠点名' %></th>
+              <td><%= form.text_field :base_name %></td>
+            </tr>
+            <tr>
+              <th><%= form.label :base_type, '拠点タイプ' %></th>
+              <td><%= form.select :base_type, [['A', 0],['B', 1],['C', 2]] %></td>
+            </tr>
+            <tr>
+        
+              <td colspan="2"><%= form.submit "修正内容を保存" %></td>
+            </tr>
+          </table>
+        <% end %>

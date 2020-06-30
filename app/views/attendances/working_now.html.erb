@@ -1,0 +1,16 @@
+<table class="table table-bordered table-condensed table-hover" id="table-attendances">
+	<tbody>
+		<tr>
+			<th>社員番号</th>
+			<th>名前</th>
+		</tr>
+		
+		<% @users.each do | user | %>
+	
+		<tr>
+			<td><%= user[0] %></td>
+			<td><%= user[1] %></td>
+		</tr>
+		<% end %>
+	</tbody>
+</table>

@@ -1,5 +1,5 @@
 class AttendancesController < ApplicationController
-  before_action :set_one_month
+  before_action :set_one_month, except: [:working_now]
 
 
 
@@ -13,22 +13,6 @@ class AttendancesController < ApplicationController
     @today = Date.current
     @attendance = @user.attendances.find_by(worked_on: params[:dayid])
     
-    unless params[:attendance][:month_work_who_consent].nil?
-      @user = User.find(params[:user_id])
-      first_day = params[:dayid]
-      @first_day = first_day.to_date
-       
-      @last_day = @first_day.end_of_month
-      @attendance_month = @user.attendances.where(worked_on: @first_day..@last_day)
-      
-      @attendance_month.each do |item|
-        attendance = Attendance.find_by(id: item.id)
-        attendance[:month_work_who_consent] = params[:attendance][:month_work_who_consent]
-        attendance.month_work = 0
-      
-        attendance.save
-      end
-    end 
       
     if @attendance.started_at.nil? 
       if @attendance.update_attribute(:started_at, Time.current)
@@ -49,6 +33,27 @@ class AttendancesController < ApplicationController
       end
     
     end
+    
+  end
+  
+  
+  def month_confirmation_create
+    unless params[:attendance][:month_work_who_consent].nil?
+      @user = User.find(params[:user_id])
+      first_day = params[:dayid]
+      @first_day = first_day.to_date
+       
+      @last_day = @first_day.end_of_month
+      @attendance_month = @user.attendances.where(worked_on: @first_day..@last_day)
+      
+      @attendance_month.each do |item|
+        attendance = Attendance.find_by(id: item.id)
+        attendance[:month_work_who_consent] = params[:attendance][:month_work_who_consent]
+        attendance.month_work = 0
+      
+        attendance.save
+      end
+    end 
     
   end
   
@@ -320,7 +325,21 @@ class AttendancesController < ApplicationController
 
   end
   
-
+  def working_now
+    @attendance = Attendance.where.not(started_at: nil).where(finished_at: nil)
+    @attendance_user_id = @attendance.pluck(:user_id).uniq
+    
+    @users = {}
+    @attendance_user_id.each do |user_id|
+    
+      user = User.find(user_id)
+      
+     
+      
+      @users.merge!(user.id => user.name)
+      
+    end
+  end
  
  
  

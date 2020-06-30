@@ -1,5 +1,5 @@
 
-<%= form_with(model: @user, url: month_confirmation_update_user_attendances_path(@user.id), local: true, method: :post) do |f| %>
+<%= form_with(model: @user, url: month_confirmation_update_user_attendances_path(@user.id), local: true, method: :patch) do |f| %>
 
     <% @users.each do |key, attendances| %>
     

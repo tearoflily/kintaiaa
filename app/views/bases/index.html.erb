@@ -11,8 +11,8 @@
 		<% if @bases.present? %>
   		<% @bases.each do | base | %>
     		<tr>
-    			<td>修正ボタン</td>
-    			<td>削除ボタン</td>
+    			<td><%= link_to '修正ボタン', edit_basis_path(base.id) %></td>
+    			<td><%= link_to '削除ボタン', basis_path(base.id), method: :delete %></td>
     			<td><%= base.base_number %></td>
     			<td><%= base.base_name %></td>
     			<td><%= base.base_type %></td>

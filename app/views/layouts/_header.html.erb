@@ -10,8 +10,8 @@
         <% if current_user %>
         <li><%= link_to "勤怠ログ", attendance_log_user_attendances_path(current_user) %></li>
           <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user) %></li>
-          <li><%= link_to "拠点情報", bases_path %></li>
-          
+          <li><%= link_to "拠点情報", bases_path %></li>working_now_path
+          <li><%= link_to "出勤中社員一覧", working_now_path %></li>
         <% end %>
   
         <li><%= link_to "Log in", login_path %></li>

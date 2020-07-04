@@ -7,7 +7,9 @@ class BasesController < ApplicationController
   
   def create
     @bases = Base.new(base_params)
-    @bases.save
+    @bases.save!
+    flash[:success] = "拠点情報の登録が完了しました"
+    redirect_to bases_url
   end
   
   def edit
@@ -17,12 +19,15 @@ class BasesController < ApplicationController
   def update
     @base = Base.find(params[:id])
     @base.update_attributes(base_params)
-    
+    flash[:success] = "拠点情報の修正が完了しました"
+    redirect_to bases_url
   end
   
   def destroy
     @base = Base.find(params[:id])
     @base.destroy
+    flash[:success] = "拠点情報の削除が完了しました"
+    redirect_to bases_url
   end
 
 private

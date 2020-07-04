@@ -1,32 +1,37 @@
 
-<%= form_with(model: @user, url: month_confirmation_update_user_attendances_path(@user.id), local: true, method: :patch) do |f| %>
 
-    <% @users.each do |key, attendances| %>
-    
-       変更 申請者：<%= who_name(key).to_s %>
-        <table class="table table-bordered table-condensed table-hover" id="table-attendances">
-        	<tbody>
-        		<tr>
-        			<th>月</th>
-        			<th>指示確認印</th>
-        			<th>変更</th>
-        			<th>指示確認印</th>
-        		</tr>
-        	
-        		
-                    <%= f.fields_for "attendances[]", attendances do |attendance| %>
-                        <tr> 
-                			<td><%= attendance.hidden_field :month, :value => attendances.worked_on %><%= attendances.worked_on.strftime('%-m月') %></td>
-                			<td><%= attendance.select :month_work, [['申請中', 0],['承認', 1],['否認', 2]] %></td>
-                			<td><%= attendance.check_box :ok_flag %></td>
-                			<td>勤怠確認</td>
-                        </tr>
-                    <% end %> 
-                
-        	
-        	</tbody>
-        </table>
-        
-    <% end %>    
-  <%= f.submit "変更を送信する", class:"btn btn-primary" %>
+<% if @users.present? %>
+  <%= form_with(model: @user, url: month_confirmation_update_user_attendances_path(@user.id), local: true, method: :patch) do |f| %>
+  
+          <% @users.each do |key, attendances| %>
+          
+             【<%= who_name(key).to_s %>　からの１ヶ月分勤怠申請】
+              <table class="table table-bordered table-condensed table-hover" id="table-attendances">
+              	<tbody>
+              		<tr>
+              			<th>月</th>
+              			<th>指示確認印</th>
+              			<th class="active">変更</th>
+              			<th>指示確認印</th>
+              		</tr>
+              	
+              		
+                          <%= f.fields_for "attendances[]", attendances do |attendance| %>
+                              <tr> 
+                      			<td><%= attendance.hidden_field :month, :value => attendances.worked_on %><%= attendances.worked_on.strftime('%-m月') %></td>
+                      			<td><%= attendance.select :month_work, [['申請中', 0],['承認', 1],['否認', 2]] %></td>
+                      			<td class="active"><%= attendance.check_box :ok_flag %></td>
+                      			<td><%= link_to '勤怠確認', new_user_attendance_path(key), class:"btn btn-primary" %></td>
+                              </tr>
+                          <% end %> 
+                      
+              	
+              	</tbody>
+              </table>
+              
+          <% end %>
+      <div class="btn-center">
+        <%= f.submit "変更を送信する", class:"btn btn-primary btn-lg" %>
+      </div>
+  <% end %>
 <% end %>

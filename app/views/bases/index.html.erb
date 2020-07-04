@@ -11,11 +11,11 @@
 		<% if @bases.present? %>
   		<% @bases.each do | base | %>
     		<tr>
-    			<td><%= link_to '修正ボタン', edit_basis_path(base.id) %></td>
-    			<td><%= link_to '削除ボタン', basis_path(base.id), method: :delete %></td>
+    			<td><%= link_to '修正ボタン', edit_basis_path(base.id), class:"btn btn-primary btn-sm" %></td>
+    			<td><%= link_to '削除ボタン', basis_path(base.id), method: :delete, class:"btn btn-primary btn-sm" %></td>
     			<td><%= base.base_number %></td>
     			<td><%= base.base_name %></td>
-    			<td><%= base.base_type %></td>
+    			<td><%= base_type(base.base_type) %></td>
     		</tr>
   		<% end %>
   	<% end %>
@@ -53,7 +53,7 @@
             </tr>
             <tr>
         
-              <td colspan="2"><%= form.submit "新規登録" %></td>
+              <td colspan="2"><%= form.submit "新規登録", class:"btn btn-primary btn-sm" %></td>
             </tr>
           </table>
         <% end %>

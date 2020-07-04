@@ -48,6 +48,7 @@ GEM
       sassc (>= 2.0.0)
     builder (3.2.4)
     byebug (11.1.3)
+    chronic (0.10.2)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0)
@@ -176,6 +177,7 @@ DEPENDENCIES
   bcrypt
   bootstrap-sass
   byebug
+  chronic
   coffee-rails (~> 4.2)
   jbuilder (~> 2.5)
   jquery-rails

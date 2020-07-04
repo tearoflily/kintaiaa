@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
     unless one_month.count == @attendances.count && @attendances.pluck(:started_at).present?
       ActiveRecord::Base.transaction do
    
-        one_month.each { |day| @user.attendances.create!(worked_on: day, started_at: nil, finished_at: nil, only_day: 1) unless @attendances.pluck(:worked_on).include? day }
+        one_month.each { |day| @user.attendances.create!(worked_on: day, started_at: nil, finished_at: nil, only_day: 1, request_status: nil) unless @attendances.pluck(:worked_on).include? day }
       end
       
       @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)

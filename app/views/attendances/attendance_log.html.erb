@@ -20,13 +20,29 @@
 		
 		<% @attendance.each do |attendance| %>
 		  <tr>
+		  
   			<td><%= attendance.worked_on %></td>
   			<td><%= l(attendance.before_started_at, format: :time) if attendance.before_started_at.present? %></td>
-  			<td><%= l(attendance.before_finished_at, format: :time) if attendance.before_finished_at.present? %></td>
-  			<td><%= l(attendance.started_at, format: :time)  %></td>
-  			<td><%= l(attendance.finished_at, format: :time)  %></td>
-  			<td><%= attendance.who_consent %></td>
-  			<td><%= attendance.request_at %></td>
+  			
+  			<% if attendance.tommorow_flag == "0" %>
+  				<td><%= l(attendance.before_finished_at, format: :time) if attendance.before_finished_at.present? %></td>
+  			<% elsif attendance.tommorow_flag == "1" %>
+  				<td><%= over24_time_type(attendance.before_finished_at) %></td>
+  			<% else %>
+  				<td></td>
+  			<% end %>
+  			
+  			<td><%= l(attendance.started_at, format: :time) if attendance.started_at.present?  %></td>
+  			<% if attendance.tommorow == "0" %>
+  				<td><%= l(attendance.finished_at, format: :time) if attendance.finished_at.present?  %></td>
+  			<% elsif attendance.tommorow == "1" %>
+  				<td><%= over24_time_type(attendance.finished_at) %></td>
+  			<% else %>
+  				<td></td>
+  			<% end %>
+  			
+  			<td><%= who_name(attendance.who_consent) %></td>
+  			<td><%= l(attendance.request_at, format: :date) %></td>
 		  </tr>
 		<% end %>
 	</tbody>

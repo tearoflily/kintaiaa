@@ -25,7 +25,7 @@ Rails.application.routes.draw do
                    post :update_waiting
                    get :edit_confirm
                    get :attendance_log
-                   
+                   get :work_basic_edit
                    post :overwork_confirm_update
                    get :overwork_confirm
                    patch :update

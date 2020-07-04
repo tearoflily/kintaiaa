@@ -13,7 +13,7 @@
 				<td colspan="4">変更後</td>
 				<td rowspan="3">備考</td>
 				<td rowspan="3">指示者確認印</td>
-				<td rowspan="3">変更</td>
+				<td rowspan="3" class="active">変更</td>
 				<td rowspan="3">勤怠を確認する</td>
 				</tr>
 				<tr>
@@ -39,21 +39,38 @@
 				<tr>
 					<%= form.fields_for "attendances[]", day do |atn| %>
 						<% if day.after_started_at.present? %>
-						
-							<td><%= atn.text_field :worked_on, readonly:true, style: "border: none" %></td>
+		
+							<td><%= l(day.worked_on, format: :short) %></td>
 							<td><%= $days_of_the_week[day.worked_on.wday] %></td>
+							
 							<td><%= day.before_started_at.hour if day.before_started_at.present? %></td>
 							<td><%= day.before_started_at.min if day.before_started_at.present? %></td>
-							<td><%= day.before_finished_at.hour if day.before_finished_at.present? %></td>
+							
+							<% if day.before_finished_at.present? && day.tommorow_flag == "0" %>
+								<td><%= day.before_finished_at.hour %></td>
+							<% elsif day.before_finished_at.present? && day.tommorow_flag == "1" %>
+								<td><%= over24(day.before_finished_at.hour) %></td>
+							<% else %>
+								<td></td>
+							<% end %>
+							
 							<td><%= day.before_finished_at.min if day.before_finished_at.present? %></td>
 							<td><%= day.after_started_at.hour %></td>
 							<td><%= day.after_started_at.min %></td>
-							<td><%= day.after_finished_at.hour %></td>
+							
+							<% if day.after_finished_at.present? && day.tommorow_flag == "0" %>
+								<td><%= day.after_finished_at.hour %></td>
+							<% elsif day.after_finished_at.present? && day.tommorow_flag == "1" %>
+								<td><%= over24(day.after_finished_at.hour) %></td>
+							<% else %>
+								<td></td>
+							<% end %>
+							
 							<td><%= day.after_finished_at.min %></td>
 							<td><%= day.note %></td>
-							<td><%= atn.select :request_status, [['申請中', 0],['承認', 1],['否認', 2]] %></td><!--  なし：nil　申請中:0　承認:1　否認:2 -->
-							<td><%= atn.check_box :ok_flag %></td>
-							<td>勤怠確認</td>
+							<td><%= atn.select :request_status, [['なし', 3],['申請中', 0],['承認', 1],['否認', 2]] %></td><!--  なし：nil　申請中:0　承認:1　否認:2 -->
+							<td class="active"><%= atn.check_box :ok_flag %></td>
+							<td><%= link_to '勤怠確認', new_user_attendance_path(key, 'work_view'), class:"btn btn-primary" %></td>
 						<% end %>
 					<% end %>
 				</tr>
@@ -62,5 +79,7 @@
 			</tbody>
 		</table>
 	<% end %>
-	<%= form.submit %>
+<div class="btn-center">
+	<%= form.submit "勤怠変更申請を承認する", class:"btn btn-primary btn-lg" %>
+</div>
 <% end %>

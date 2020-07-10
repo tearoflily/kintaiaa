@@ -1,7 +1,9 @@
 <%= form_tag(attendance_log_user_attendances_path(current_user), method: :get)  do %>
-
-	<%= date_select("worked_on_between","date",{:discard_day => true, :default => @attendance_default}) %>
-	<%= submit_tag "検索" %>
+	<%= link_to 'リセットボタン', attendance_log_delete_user_attendances_path(current_user, @attendance_default), method: :delete, class:"btn btn-primary" %>
+	
+	<%= date_select("worked_on_between","date",{:discard_day => true, :default => @attendance_default}, {class: "form-control bootstrap-date-only-width"}) %>
+	
+	<%= submit_tag "検索", class:"btn btn-primary" %>
 <% end %>
 
 <% if @attendance %>

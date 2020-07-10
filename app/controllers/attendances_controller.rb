@@ -1,13 +1,29 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now]
+  before_action :logged_in_user
+  before_action :correct_user, only: [:create, :attendance_log, :attendance_log_delete, :month_confirmation_create, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :admin_user, only: [:month_confirmation, :month_confirmation_update, :working_now]
+  before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update]
 
 
+  
 
   def new #勤怠一覧画面
    @user = User.find(params[:user_id])
    @attendance_month_work = @user.attendances.new
+   
+   
+   if params[:format].present?
+     respond_to do |format|
+       format.csv do
+         send_data render_to_string, filename: "attendances.csv", type: :csv
+         
+       end
+     end
+   end
   end
   
+
   
   def create #勤怠一覧画面 「出勤」「退勤」ボタン押下時処理
     @user = User.find(params[:user_id])
@@ -105,48 +121,59 @@ class AttendancesController < ApplicationController
 
   
   def update_waiting # 勤怠編集画面　送信処理
-    @user = User.find(params[:user_id])
-
-    attendance_edit_params.each do |id, item|
-      if item[:who_consent].present?
-          attendance = Attendance.find(id)
-          
-          year = attendance[:worked_on].year
-          month = attendance[:worked_on].month
-          
-          
-          at_after_started_at = Time.new(year.to_i, month.to_i, item["after_started_at(3i)"].to_i, item["after_started_at(4i)"].to_i, item["after_started_at(5i)"].to_i)
-          at_after_finished_at = Time.new(year.to_i, month.to_i, item["after_finished_at(3i)"].to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
-          
-          attendance[:after_started_at] = at_after_started_at.to_datetime
-          attendance[:after_finished_at] = at_after_finished_at.to_datetime
+   ActiveRecord::Base.transaction do
+      @user = User.find(params[:user_id])
   
-         
+      attendance_edit_params.each do |id, item|
+        if item[:who_consent].present?
           
-          attendance[:request_at] = Time.current
-          attendance[:request_type] = 1
-          attendance[:request_status] = 0
+            @attendance = Attendance.find(id)
+            
+            year = @attendance[:worked_on].year
+            month = @attendance[:worked_on].month
+            
+            
+            at_after_started_at = Time.new(year.to_i, month.to_i, item["after_started_at(3i)"].to_i, item["after_started_at(4i)"].to_i, item["after_started_at(5i)"].to_i)
+            at_after_finished_at = Time.new(year.to_i, month.to_i, item["after_finished_at(3i)"].to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
+            
+            at_after_started_at = nil if item["after_started_at(5i)"].blank?
+            at_after_finished_at = nil if item["after_finished_at(5i)"].blank?
+            
+            @attendance[:after_started_at] = at_after_started_at
+            @attendance[:after_finished_at] = at_after_finished_at
         
-          attendance[:before_started_at] = attendance[:started_at]
-          attendance[:before_finished_at] = attendance[:finished_at]
+            @attendance[:request_at] = Time.current
+            @attendance[:request_type] = 1
+            @attendance[:request_status] = 0
           
+            @attendance[:before_started_at] = @attendance[:started_at]
+            @attendance[:before_finished_at] = @attendance[:finished_at]
+            
+          
+            
+            
+            @attendance[:who_consent] = item[:who_consent]
         
-          
-          
-          attendance[:who_consent] = item[:who_consent]
-      
-          attendance[:tommorow_flag] = item[:tommorow_flag]
-          
-          unless attendance[:before_started_at] == attendance[:after_started_at] && attendance[:after_finished_at] == attendance[:before_finished_at]
-            attendance.update_attributes!(update_waiting_parmas)
-          end
-      end   
-    end
-      
-  
-
-      flash[:success] = "勤怠変更を申請しました。承認までしばらくお待ちください。"
-      redirect_to new_user_attendance_url
+            @attendance[:tommorow_flag] = item[:tommorow_flag]
+            
+            
+            
+            unless @attendance[:before_started_at] == @attendance[:after_started_at] && @attendance[:after_finished_at] == @attendance[:before_finished_at]
+              if @attendance.save(update_waiting_parmas)
+                
+                flash[:success] = "勤怠変更を申請しました。承認までしばらくお待ちください。"
+                redirect_to new_user_attendance_path
+              else
+                flash.now[:danger] = "勤怠変更を申請できませんでした。"
+                render :edit and return
+              end
+            end
+        end   
+      end
+   rescue ActiveRecord::RecordInvalid
+     flash.now[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
+     render :edit
+   end
   end
   
   
@@ -237,6 +264,35 @@ class AttendancesController < ApplicationController
     
   end
   
+  def attendance_log_delete
+   
+    @user = User.find(params[:user_id])
+    day = params[:format]
+    day_to_date = day.to_date
+    month_start = day_to_date.beginning_of_month
+    month_end = month_start.end_of_month
+
+    log_delete_month = @user.attendances.where(worked_on: month_start..month_end)
+    log_delete_month.each do |id, log_day|
+    
+      attendance = Attendance.find_by(id: id)
+      
+      unless attendance.only_day == 1 && attendance.started_at.nil?
+        attendance[:before_started_at] = nil
+        attendance[:before_finished_at] = nil
+        attendance[:after_started_at] = nil
+        attendance[:after_finished_at] = nil
+        attendance[:request_status] = nil
+  
+        attendance.save
+      end
+      
+      
+    end
+    redirect_to attendance_log_user_attendances_url
+    flash[:success] = "該当月のログを消去しました"
+  end
+  
   def overwork #残業申請 画面
     @user = User.find(params[:user_id])
     @attendance = @user.attendances.find_by(id: params[:id])
@@ -245,43 +301,45 @@ class AttendancesController < ApplicationController
 
   def overwork_update #残業申請 送信処理
     @user = User.find(params[:user_id])
-    attendance = Attendance.find(params[:id])
+    @attendance = Attendance.find(params[:id])
     
-    year = attendance.worked_on.year
-    month = attendance.worked_on.month
+    year = @attendance.worked_on.year
+    month = @attendance.worked_on.month
   
-    attendance.after_finished_at = Time.new(year.to_i, month.to_i, params[:attendance]["after_finished_at(3i)"].to_i, params[:attendance]["after_finished_at(4i)"].to_i, params[:attendance]["after_finished_at(5i)"].to_i)
-    attendance.after_finished_at.to_datetime
-    attendance.request_at = Time.current
-    attendance.request_type = 2
-    attendance.request_status = 0
-    attendance.before_finished_at = attendance.finished_at
-    attendance.before_started_at = attendance.started_at
-    attendance.tommorow_flag = params[:attendance][:tommorow_flag]
+    @attendance.after_finished_at = Time.new(year.to_i, month.to_i, params[:attendance]["after_finished_at(3i)"].to_i, params[:attendance]["after_finished_at(4i)"].to_i, params[:attendance]["after_finished_at(5i)"].to_i)
+    @attendance.after_finished_at.to_datetime
+    @attendance.after_started_at = @attendance.started_at
+    @attendance.request_at = Time.current
+    @attendance.request_type = 2
+    @attendance.request_status = 0
+    @attendance.before_finished_at = @attendance.finished_at
+    @attendance.before_started_at = @attendance.started_at
+    @attendance.tommorow_flag = params[:attendance][:tommorow_flag]
     
-    if attendance.save
+    if @attendance.save
       flash[:success] = "残業申請を送信しました"
       redirect_to new_user_attendance_path
     else
       flash[:danger] = "残業申請を送信できませんでした"
-      render :overwork
+      redirect_to overwork_confirm_user_attendances_path
     end
     
   end
   
   def overwork_confirm #残業申請 承認画面
     @user = User.find(params[:user_id])
-    @attendance = Attendance.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 2).to_a
-    @attendance_user_id = @attendance.pluck(:user_id)
-    @user_new = User.new
+    attendance_all = Attendance.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 2).to_a
+    attendance_user_id = attendance_all.pluck(:user_id)
+    user_new = User.new
+    @attendance = Attendance.new
     
     @users = {}
-    @attendance_user_id.each do |user_id|
-    
-      @user_new = User.find_by(id: user_id)
-      @user_attendance = @user_new.attendances.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 2).to_a
+    attendance_user_id.each do |user_id|
+   
+      user_new = User.find_by(id: user_id)
+      user_attendance = user_new.attendances.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 2).to_a
       
-      @users.merge!(user_id => @user_attendance)
+      @users.merge!(user_id => user_attendance)
     end
   end
   
@@ -295,9 +353,9 @@ class AttendancesController < ApplicationController
         if item[:request_status] == "1"
           
         
-          @new_attendance = @user.attendances.new
+          @attendance = @user.attendances.new
         
-          @new_attendance.started_at = attendance.before_started_at
+          @attendance.started_at = attendance.before_started_at
           
           year = attendance[:worked_on].year
           month = attendance[:worked_on].month
@@ -306,18 +364,18 @@ class AttendancesController < ApplicationController
           at_after_finished_at = Time.new(year.to_i, month.to_i, item["after_finished_at(3i)"].to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
           
          
-          @new_attendance.finished_at = at_after_finished_at
-          @new_attendance.who_consent = attendance.who_consent
-          @new_attendance.worked_on = attendance[:worked_on]
-          @new_attendance.note = attendance.note
-          @new_attendance.request_type = attendance.request_type
-          @new_attendance.request_status = 1
-          @new_attendance.tommorow = item[:tommorow_flag]
-          @new_attendance.only_day = 1
+          @attendance.finished_at = at_after_finished_at
+          @attendance.who_consent = attendance.who_consent
+          @attendance.worked_on = attendance[:worked_on]
+          @attendance.note = attendance.note
+          @attendance.request_type = attendance.request_type
+          @attendance.request_status = 1
+          @attendance.tommorow = item[:tommorow_flag]
+          @attendance.only_day = 1
           
-          @new_attendance.before_started_at = attendance.started_at
-          @new_attendance.before_finished_at = attendance.finished_at
-          @new_attendance.tommorow_flag = attendance.tommorow
+          @attendance.before_started_at = attendance.started_at
+          @attendance.before_finished_at = attendance.finished_at
+          @attendance.tommorow_flag = attendance.tommorow
           
           attendance.started_at = attendance.after_started_at
           attendance.finished_at = attendance.after_finished_at
@@ -325,14 +383,16 @@ class AttendancesController < ApplicationController
           attendance.request_status = "3"
           attendance.only_day = nil
    
-          attendance.save!
+          
   
-          if @new_attendance.save!
-            flash.now[:success] = "勤怠情報の変更が完了しました"
-            redirect_to new_user_attendance_path
+          if @attendance.save
+            attendance.save
+            flash[:success] = "残業申請の承認が完了しました"
+            redirect_to new_user_attendance_url
            
           else
-            flash.now[:danger] = "勤怠情報の変更が完了していません。"
+            flash[:danger] = "残業申請の承認が完了していません。"
+            session[:error] = @attendance.errors.full_messages
             redirect_to overwork_confirm_user_attendances_path
           end 
         elsif item[:request_status] == "2"
@@ -342,18 +402,21 @@ class AttendancesController < ApplicationController
           attendance.before_started_at = nil
           attendance.before_finished_at = nil
           attendance.request_at = nil
-          attendance.request_type = nil
-          attendance.only_day = nil
+          attendance.request_type = 1
           attendance.tommorow_flag = nil
           attendance.request_status = 2
           attendance.save!
           
           redirect_to new_user_attendance_path
           flash.now[:success] = "変更しました"
-        
+          
+        elsif item[:request_status] == "0"
+          flash[:danger] = "指示者確認印が変更���れていません"
+          redirect_to overwork_confirm_user_attendances_path
         end
-
+    
     end
+   
   end
   
   def month_confirmation #1ヶ月分の勤怠 承認画面

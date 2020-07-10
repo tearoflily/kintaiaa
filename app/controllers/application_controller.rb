@@ -12,11 +12,7 @@ class ApplicationController < ActionController::Base
     
     @user = User.find(params[:user_id])
     @attendances = @user.attendances.where(worked_on: @first_day..@last_day).order(:worked_on)
-  
- 
 
-    
-   
     unless one_month.count == @attendances.count && @attendances.pluck(:started_at).present?
       ActiveRecord::Base.transaction do
    
@@ -31,6 +27,35 @@ class ApplicationController < ActionController::Base
   rescue ActiveRecord::RecordInvalid
       flash[:danger] = "ページ情報の取得に失敗しました。再度アクセスしてください"
       redirect_to root_url
+  end
+  
+  
+  
+  def logged_in_user
+    unless logged_in?
+      flash[:danger] = "ログインしてください"
+      redirect_to login_url
+    end
+  end
+  
+  def correct_user
+    redirect_to(root_url) unless current_user?(@user)
+  end
+  
+  def superior_user
+    redirect_to root_url unless current_user.superior?
+  end
+  
+  def admin_user
+    redirect_to root_url unless current_user.admin?
+  end
+  
+  def admin_or_correct_user
+    @user = User.find(params[:user_id]) if @user.blank?
+    unless current_user?(@user) || current_user.admin?
+      flash[:danger] = "編集権限がありません"
+      redirect_to(root_url)
+    end
   end
   
 end

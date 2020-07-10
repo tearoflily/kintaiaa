@@ -1,6 +1,15 @@
 
-
+  
 <%= form_with(model: @user, url: update_waiting_user_attendances_path(@user.id), local: true, method: :post) do |f| %>
+<%= render 'shared/error_messages', object: @attendance %>
+ 	<% if flash[:error].present? %>
+    <ul class="errors">
+      <% flash[:error].each do |e| %>
+        <li><%= e %></li>
+      <% end %>
+    </ul>
+  <% end %>
+  
 	氏名：<%= @user.name %>
 	
 	<table class="table table-bordered table-condensed table-hover" id="table-attendances">

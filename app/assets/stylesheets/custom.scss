@@ -140,9 +140,69 @@ p {
 
 #table-attendances {
   margin: 50px, 50px ;
+
 }
 
 .btn-center {
   vertical-align: middle;
   text-align: center;  
+}
+
+.attendance_count_border {
+  color: black;
+  
+}
+
+.attendance_count_border a{
+  color: black;
+}
+
+#attendance_red {
+  color: red;
+  font-weight: bold;
+}
+
+#attendance_red a {
+  color: red;
+}
+.attendance_count_border span{
+  border: 2px solid red;
+  font-weight: bold;
+  color: red;
+}
+
+.modal-dialog-center {
+  padding-top: 10%;
+}
+
+
+.bootstrap-date-only-width {
+  width: auto;
+}
+
+
+
+.modal-header {
+  border: none;
+}
+
+.modal-body {
+  padding-bottom: 65px;
+}
+
+/* error_messages */
+
+#error_explanation {
+  color: red;
+  ul {
+    color: red;
+    margin: 0 0 30px 0;
+  }
+}
+
+.field_with_errors {
+  @extend .has-error;
+  .form-control {
+    color: $state-danger-text;
+  }
 }

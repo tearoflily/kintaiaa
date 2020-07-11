@@ -1,7 +1,9 @@
 
   
 <%= form_with(model: @user, url: update_waiting_user_attendances_path(@user.id), local: true, method: :post) do |f| %>
-<%= render 'shared/error_messages', object: @attendance %>
+
+	<%= render 'shared/error_messages', object: @attendance %>
+
  	<% if flash[:error].present? %>
     <ul class="errors">
       <% flash[:error].each do |e| %>
@@ -64,8 +66,8 @@
 			  			</td>
 			  			
 			  			<td>
-			  				<%= attendance.collection_select :who_consent, User.where(superior: true), :id, :name, {include_blank: '選択してください' }, :prompt => true %> 
-			  			
+			  				<%= attendance.collection_select :who_consent, @select_attendance, :id, :name, {include_blank: '選択してください' }, :prompt => true %> 
+			  
 			  			</td>
 						<% end %>
 					<% end %>

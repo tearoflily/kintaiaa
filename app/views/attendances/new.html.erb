@@ -31,41 +31,43 @@
 	</tbody>
 </table>
 
-<div class="attendance_count_border">
-	<% @month_confirm_count = month_confirm_count(current_user.id) %>
-	<% if @month_confirm_count == 0 %>
-		【所属長承認申請のお知らせ】
-	<% else %>
-		<%= link_to "【所属長承認申請のお知らせ】", month_confirmation_user_attendances_path(@user.id), remote: true, id:"attendance_red" %>
-	<% end %>
-	<% unless @month_confirm_count == 0 || nil %>
-		<span><%= @month_confirm_count %>件の通知があります</span>
-	<% end %>
-</div>
-
-<div class="attendance_count_border">
-	<% @edit_count = edit_confirm_count(current_user.id) %>
-	<% if @edit_count == 0 %>
-		【勤怠変更申請のお知らせ】
-	<% else %>
-		<%= link_to "【勤怠変更申請のお知らせ】 ", edit_confirm_user_attendances_path(@user.id), remote: true, id:"attendance_red" %>
-	<% end %>
-	<% unless @edit_count == 0 || nil %>
-		<span><%= @edit_count %>件の通知があります</span>
-	<% end %>
-</div>
-
-<div class="attendance_count_border">
-	<% @overwork_count = overwork_confirm_count(current_user.id) %>
-	<% if @overwork_count == 0 %>
-		【残業申請のお知らせ】
-	<% else %>
-		<%= link_to "【残業申請のお知らせ】", overwork_confirm_user_attendances_path(@user.id), remote: true, id:"attendance_red" %>
-	<% end %>
-	<% unless @overwork_count == 0 || nil %>
-		<span><%= @overwork_count %>件の通知があります</span>
-	<% end %>
-</div>
+<% if superior_user?(@user) %>
+	<div class="attendance_count_border">
+		<% @month_confirm_count = month_confirm_count(current_user.id) %>
+		<% if @month_confirm_count == 0 %>
+			【所属長承認申請のお知らせ】
+		<% else %>
+			<%= link_to "【所属長承認申請のお知らせ】", month_confirmation_user_attendances_path(@user.id), remote: true, id:"attendance_red" %>
+		<% end %>
+		<% unless @month_confirm_count == 0 || nil %>
+			<span><%= @month_confirm_count %>件の通知があります</span>
+		<% end %>
+	</div>
+	
+	<div class="attendance_count_border">
+		<% @edit_count = edit_confirm_count(current_user.id) %>
+		<% if @edit_count == 0 %>
+			【勤怠変更申請のお知らせ】
+		<% else %>
+			<%= link_to "【勤怠変更申請のお知らせ】 ", edit_confirm_user_attendances_path(@user.id), remote: true, id:"attendance_red" %>
+		<% end %>
+		<% unless @edit_count == 0 || nil %>
+			<span><%= @edit_count %>件の通知があります</span>
+		<% end %>
+	</div>
+	
+	<div class="attendance_count_border">
+		<% @overwork_count = overwork_confirm_count(current_user.id) %>
+		<% if @overwork_count == 0 %>
+			【残業申請のお知らせ】
+		<% else %>
+			<%= link_to "【残業申請のお知らせ】", overwork_confirm_user_attendances_path(@user.id), remote: true, id:"attendance_red" %>
+		<% end %>
+		<% unless @overwork_count == 0 || nil %>
+			<span><%= @overwork_count %>件の通知があります</span>
+		<% end %>
+	</div>
+<% end %>
 
 
 <div>

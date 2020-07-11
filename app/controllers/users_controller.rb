@@ -12,9 +12,20 @@ class UsersController < ApplicationController
   end
   
   def new
+    @user = User.new
   end
   
   def create
+    
+    @user = User.new(user_params)
+    if @user.save
+      flash[:success] = '新規作成に成功しました。'
+      log_in @user
+      redirect_to new_user_attendance_path @user
+    else
+      flash[:danger] = "ユーザー登録に失敗しました。"
+      render :new
+    end
   end
   
   def edit
@@ -43,6 +54,7 @@ class UsersController < ApplicationController
     User.import(params[:file])
     redirect_to users_url
   end
+
   
   private
   
@@ -51,6 +63,21 @@ class UsersController < ApplicationController
                                     :designated_work_start_time, :designated_work_end_time, :password, :password_confirmation)
     end
     
+        
+    def superior_user
+      unless current_user.superior || current_user.admin
+        flash[:danger] = "管理者または上長のみ操作可能です。"
+        redirect_to root_url
+      end
+    end
+    
+    def admin_user
+      unless current_user.admin
+        flash[:danger] = "管理者のみ操作可能です。"
+        redirect_to root_url
+      end
+    end
+  
   
   
 end

@@ -6,19 +6,21 @@
         <li><%= link_to "Top", root_path %></li>
         
         
-        <li><%= link_to "ユーザー一覧", users_path %></li>
         
-       
-        <% if current_user %>
         
-          <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user) %></li>
-          <li><%= link_to "拠点情報", bases_path %></li>working_now_path
+        <% if current_user.present? && admin_user?(current_user.id) %>
+          <li><%= link_to "ユーザー一覧", users_path %></li>
           <li><%= link_to "出勤中社員一覧", working_now_path %></li>
+          <li><%= link_to "拠点情報", bases_path %></li>
           <li><%= link_to "基本情報の更新", work_basic_edit_user_attendances_path(current_user) %></li>
-          
+        <% end %>
+        
+        <% if current_user.present? %>
+        
+          <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user.id) %></li>
           <li><%= link_to "ログアウト", logout_path, method: :delete %></li>
         <% end %>
-        <% if current_user.nil? %>
+        <% if !current_user.present? %>
           <li><%= link_to "ログイン", login_path %></li>
         <% end %>
         

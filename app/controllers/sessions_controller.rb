@@ -8,7 +8,7 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:user][:email].downcase)
  
     if user && user.authenticate(params[:user][:password])
-      log_in user
+      log_in(user)
       flash[:success] = "ログインしました。"
       redirect_to new_user_attendance_path(current_user)
     else

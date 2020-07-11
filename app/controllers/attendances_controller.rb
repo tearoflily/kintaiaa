@@ -1,10 +1,11 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now]
   before_action :logged_in_user
-  before_action :correct_user, only: [:new, :create, :attendance_log, :attendance_log_delete, :month_confirmation_create, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :admin_or_correct_user, only: [:new]
+  before_action :correct_user, only: [:create, :attendance_log, :attendance_log_delete, :month_confirmation_create, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
   before_action :admin_user, only: [:month_confirmation, :month_confirmation_update, :working_now]
   before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update]
-
+  before_action :set_select_who_consent, only: [:edit, :update_waiting]
 
   
 
@@ -101,7 +102,7 @@ class AttendancesController < ApplicationController
       
         if attendance.save!
           flash[:success] = "1ヶ月分勤怠の承認申請を送信しました。"
-
+          redirect_to new_user_attendance_path and return
         else
           flash[:danger] = "1ヶ月分勤怠の承認申請を送信できませんでした。"
           render :new
@@ -115,6 +116,10 @@ class AttendancesController < ApplicationController
   
   def edit #勤怠編集画面
     @attendance = @user.attendances.find_by(user_id: current_user.id)
+    
+  end
+  
+  def set_select_who_consent
     @select_attendance = User.where(superior: true)
   end
   
@@ -210,57 +215,58 @@ class AttendancesController < ApplicationController
   end
   
   def update #勤怠変更承認時の処理
-    update_edit_params.each do |id, item|
-           
-        if item[:ok_flag] == "1" && item[:request_status] == "1"
-    
-          attendance = Attendance.find_by(id: id)
-          @user = User.find_by(id: attendance.user_id)
-          @new_attendance = @user.attendances.new
-            
-              @new_attendance[:started_at] = attendance.after_started_at
-              @new_attendance[:finished_at] = attendance.after_finished_at
-              @new_attendance[:before_started_at] = attendance.before_started_at
-              @new_attendance[:before_finished_at] = attendance.before_finished_at
-              @new_attendance[:who_consent] = attendance.who_consent
-              @new_attendance[:request_at] = Time.current
-        
-              @new_attendance[:worked_on] = attendance[:worked_on]
-              @new_attendance[:note] = attendance.note
-              @new_attendance[:request_type] = attendance.request_type
-              @new_attendance[:request_status] = 1
+    ActiveRecord::Base.transaction do
+      update_edit_params.each do |id, item|
              
-              at_after_tommorow_flag = attendance[:tommorow_flag]
-       
-              if attendance[:tommorow].present?
-                @new_attendance[:tommorow_flag] = attendance[:tommorow]
-              end
+          if item[:ok_flag] == "1" && item[:request_status] == "1"
+      
+            attendance = Attendance.find_by(id: id)
+            @user = User.find_by(id: attendance.user_id)
+            @new_attendance = @user.attendances.new
               
-              @new_attendance[:tommorow] = at_after_tommorow_flag
-              @new_attendance[:only_day] = 1
-              
-              @new_attendance.save!
-
-              attendance[:started_at] = attendance[:after_started_at]
-              attendance[:finished_at] = attendance[:after_finished_at]
-              attendance[:request_at] = Time.current
-              attendance[:request_type] = attendance.request_type
-              attendance[:only_day] = nil
-              attendance[:request_status] = "3"
-              
-           
-              if attendance.save!
-                flash[:success] = "承認が完了しました"
-              else  
-                flash[:danger] = "更新に失敗しました"
-              end
+                @new_attendance[:started_at] = attendance.after_started_at
+                @new_attendance[:finished_at] = attendance.after_finished_at
+                @new_attendance[:before_started_at] = attendance.before_started_at
+                @new_attendance[:before_finished_at] = attendance.before_finished_at
+                @new_attendance[:who_consent] = attendance.who_consent
+                @new_attendance[:request_at] = Time.current
           
+                @new_attendance[:worked_on] = attendance[:worked_on]
+                @new_attendance[:note] = attendance.note
+                @new_attendance[:request_type] = attendance.request_type
+                @new_attendance[:request_status] = 1
+               
+                at_after_tommorow_flag = attendance[:tommorow_flag]
+         
+                if attendance[:tommorow].present?
+                  @new_attendance[:tommorow_flag] = attendance[:tommorow]
+                end
+                
+                @new_attendance[:tommorow] = at_after_tommorow_flag
+                @new_attendance[:only_day] = 1
+                
+                @new_attendance.save!
+  
+                attendance[:started_at] = attendance[:after_started_at]
+                attendance[:finished_at] = attendance[:after_finished_at]
+                attendance[:request_at] = Time.current
+                attendance[:request_type] = attendance.request_type
+                attendance[:only_day] = nil
+                attendance[:request_status] = "3"
+                
+             
+                if attendance.save!
+                  flash[:success] = "承認が完了しました"
+                else  
+                  flash[:danger] = "更新に失敗しました"
+                end
             
-        end
-        
-        
+              
+          end
+          
+          
+      end
     end
-
     redirect_to new_user_attendance_path, flash: { success: "勤怠情報の変更が完了しました" }
   rescue ActiveRecord::RecordInvalid
     flash.now[:danger] = "勤怠情報の変更が完了していません。"
@@ -472,41 +478,48 @@ class AttendancesController < ApplicationController
   end
   
   def month_confirmation_update #1ヶ月分の勤怠承認処理
-  
-    
-    update_month_edit_params.each do |key, item|
-     
+    ActiveRecord::Base.transaction do
       
-      if item[:month_work] == "1" && item[:ok_flag] == "1"
-        @attendance_month = Attendance.find_by(id: key)
-        @user = User.find_by(id: @attendance_month.user_id)
-        @month_start = @attendance_month.worked_on.beginning_of_month
-        @month_end = @month_start.end_of_month
-        @month = @user.attendances.where(worked_on: @month_start..@month_end)
-        @month.each do | day |
+      update_month_edit_params.each do |key, item|
+       
+        
+        if item[:month_work] == "1" && item[:ok_flag] == "1"
           
-          attendance = Attendance.find(day.id)
-          
-          attendance.month_work = 1
-          
-     
-          
-          if attendance.save!
-            flash[:success] = "勤怠の承認が完了しました"
-            redirect_to new_user_attendance_path(current_user)
-          else
-            flash[:danger] = "勤怠の承認処理中にエラーが発生しました"
-            render :month_confirmation
+          @attendance_month = Attendance.find_by(id: key)
+          @user = User.find_by(id: @attendance_month.user_id)
+          @month_start = @attendance_month.worked_on.beginning_of_month
+          @month_end = @month_start.end_of_month
+          @month = @user.attendances.where(worked_on: @month_start..@month_end)
+          @month.each do | day |
+            attendance = Attendance.find(day.id)
+            attendance.month_work = 1
+            attendance.save!
           end
-          
+        elsif item[:month_work] == "2" && item[:ok_flag] == "1"
+          @attendance_month = Attendance.find_by(id: key)
+          @user = User.find_by(id: @attendance_month.user_id)
+          @month_start = @attendance_month.worked_on.beginning_of_month
+          @month_end = @month_start.end_of_month
+          @month = @user.attendances.where(worked_on: @month_start..@month_end)
+          @month.each do | day |
+            attendance = Attendance.find(day.id)
+            attendance.month_work = 2
+            attendance.save!
+          end
         end
+        flash[:success] = "一ヶ月勤怠の承認および否認の回答が完了しました"
+        redirect_to new_user_attendance_path(current_user) and return
+
       end
       
-    
     end
-    
-
+  rescue ActiveRecord::RecordInvalid
+    flash[:danger] = "一ヶ月勤怠の承認が失敗しました"
+    redirect_to new_user_attendance_path(current_user) and return
   end
+  
+  
+  
   
   def working_now # 現在出勤中の社員一覧
     @attendance = Attendance.where.not(started_at: nil).where(finished_at: nil)

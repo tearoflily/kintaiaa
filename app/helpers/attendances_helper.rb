@@ -58,5 +58,43 @@ module AttendancesHelper
     count = Attendance.where(who_consent: id).where(request_status: 0).where(request_type: 2).count
     return count
   end
+  
+  
+  def zishazikan(start_time, finish_time, tommorow)
+    start = (start_time.hour * 60) + start_time.min
+    s_finish = (finish_time.hour * 60) + finish_time.min
+    
+    if tommorow == "1"
+      finish = s_finish + 720 
+    elsif tommorow == "0" || tommorow == nil
+      finish = s_finish + 0
+    end
+    
+    sum_min = finish.to_i - start.to_i
+    sum_hour = sum_min / 60.00
+    sum_string = sum_hour.round(3).to_s
+    sum_array = sum_string.split(".")
+    sum_min_min = sum_array[1].to_i * 0.06
+    @sum_time = sum_array[0] + ":" + format("%02d",sum_min_min)
 
+    return @sum_time
+
+  end
+  
+  def zaisha(finish, start)
+    finish = finish
+    start = start
+    format("%.2f", (((finish - start) / 60) / 60))
+  end
+  
+  def view_sum(time)
+
+    time_f = time.to_s
+    sum_array = time_f.split(".")
+    sum_min_min = sum_array[1].to_i / 166.6 * 100
+    @sum_time = sum_array[0] + ":" + format("%02d",sum_min_min)
+
+    return @sum_time
+  end
+ 
 end

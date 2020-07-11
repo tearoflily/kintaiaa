@@ -3,4 +3,6 @@
 <h1>勤怠管理システム</h1>
 <p class="top_center">このアプリケーションでは、登録されたユーザーの勤怠情報を閲覧・登録・編集することができます。</p>
 
-<p class="top_center">新規会員登録は<%= link_to "こちら",new_user_path %>から</p>
+<% if !current_user.present? %>
+  <p class="top_center">新規会員登録は<%= link_to "こちら",new_user_path %>から</p>
+<% end %>

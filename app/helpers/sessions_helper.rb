@@ -27,15 +27,21 @@ module SessionsHelper
   end
   
   def admin_user?(user)
-    user.superior?
+    admin_check = User.find(user)
+    admin_check.admin?
   end
   
   def superior_user?(user)
-    user.superior?
+    superior_check = User.find(user)
+    superior_check.superior?
   end
   
   def logged_in?
     !current_user.nil?
+  end
+  
+  def now_view_correct_user?(user)
+    user == params[:user_id].to_i
   end
   
 end

@@ -1,3 +1,4 @@
+<% @sum = 0 %>
 
 <table class="table table-bordered table-condensed table-hover" id="table-attendances">
 	<tbody>
@@ -31,7 +32,8 @@
 	</tbody>
 </table>
 
-<% if superior_user?(@user) %>
+
+<% if superior_user?(current_user.id) && now_view_correct_user?(current_user.id) %>
 	<div class="attendance_count_border">
 		<% @month_confirm_count = month_confirm_count(current_user.id) %>
 		<% if @month_confirm_count == 0 %>
@@ -160,7 +162,7 @@
 						<% end %>
 					<% end %>
 					</td>
-					<td></td>
+					<td><%= zishazikan(day.started_at, day.finished_at, day.tommorow) if day.started_at.present? && day.finished_at.present? %></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -173,15 +175,20 @@
 					</td>
 		</tr>
 
+			<% if day.started_at.present? && day.finished_at.present? && day.only_day == 1 %>
+			          <% @i = zaisha(day.finished_at, day.started_at).to_f %>
+			          <% @sum += @i %>
+			<% end %>
+
 	<% end %>
 		<tr>
-			
+		
 			<% if params[:format].nil? %>
 			<td></td>
 			<% end %>
 			<td colspan="2"></td>
 			<td colspan="6"></td>
-			<td></td>
+			<td><%= view_sum(@sum) %></td>
 			<td colspan="5"></td>
 			<td>
 

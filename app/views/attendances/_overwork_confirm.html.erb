@@ -29,7 +29,7 @@
             
             
                   <% @users.each do |key, attendances| %>
-                
+                  
                      変更 申請者：<%= who_name(key).to_s %>
                       <table class="table table-bordered table-condensed table-hover" id="table-attendances">
                       	<tbody>
@@ -43,7 +43,7 @@
                       		</tr>
                       		
                       		<% attendances.each do |day| %>
-                     
+                           
                             		<%= f.fields_for "attendances[]", day do |atn| %>
                             		
                             	        <% if day.after_finished_at.present? %>
@@ -67,7 +67,7 @@
                               	     </tr>
                               	     <% end %>
                               	   <% end %>
-                      		<% end %>
+                      		<% end %> 
                       	</tbody>
                       </table>
                       

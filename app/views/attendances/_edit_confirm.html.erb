@@ -18,7 +18,7 @@
       <%= form_with model: @user, url:user_attendances_path(current_user), local: true do |form| %>
    
       			<% @users.each do |key,attendances| %>
-      				
+      			
       				<table class="table table-bordered table-condensed table-hover" id="table-attendances">
       						<div><h2>【<%= who_name(key).to_s %> からの勤怠変更申請】</h2></div>
       					<thead>
@@ -62,9 +62,9 @@
       									<td><%= day.before_started_at.hour if day.before_started_at.present? %></td>
       									<td><%= day.before_started_at.min if day.before_started_at.present? %></td>
       									
-      									<% if day.before_finished_at.present? && day.tommorow_flag == "0" %>
+      									<% if day.before_finished_at.present? && day.tommorow == "0" %>
       										<td><%= day.before_finished_at.hour %></td>
-      									<% elsif day.before_finished_at.present? && day.tommorow_flag == "1" %>
+      									<% elsif day.before_finished_at.present? && day.tommorow == "1" %>
       										<td><%= over24(day.before_finished_at.hour) %></td>
       									<% else %>
       										<td></td>

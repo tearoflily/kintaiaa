@@ -1,3 +1,4 @@
+
 <table class="table table-bordered table-condensed table-hover" id="table-attendances">
 	<tbody>
 		<tr>
@@ -182,7 +183,7 @@
 			<td colspan="5"></td>
 			<td>
 
-				
+			<% if params[:format].nil? %>
 				<% if @attendances.first.month_work == nil %>
 						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
 							<div>所属長承認</div>
@@ -196,6 +197,7 @@
 				<% elsif @attendances.first.month_work == 2 %>
 					所属長承認：拒否済み
 				<% end %>
+			<% end %>
 			</td>
 		</tr>
 	

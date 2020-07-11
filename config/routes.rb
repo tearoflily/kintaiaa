@@ -25,6 +25,7 @@ Rails.application.routes.draw do
                    post :update_waiting
                    get :edit_confirm
                    get :attendance_log
+                   delete :attendance_log_delete
                    get :work_basic_edit
                    post :overwork_confirm_update
                    get :overwork_confirm
@@ -41,5 +42,4 @@ Rails.application.routes.draw do
   end
   
 
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

@@ -1,7 +1,8 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now]
+
   before_action :logged_in_user
-  before_action :admin_or_correct_user, only: [:new]
+  before_action :admin_or_correct_user, only: [:new, :create, :month_confirmation_create, :edit]
   before_action :correct_user, only: [:create, :attendance_log, :attendance_log_delete, :month_confirmation_create, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
   before_action :admin_user, only: [:month_confirmation, :month_confirmation_update, :working_now]
   before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update]
@@ -120,7 +121,7 @@ class AttendancesController < ApplicationController
   end
   
   def set_select_who_consent
-    @select_attendance = User.where(superior: true)
+    @select_attendance = User.where(superior: true).where.not(id: current_user.id)
   end
   
 
@@ -128,71 +129,69 @@ class AttendancesController < ApplicationController
 
   
   def update_waiting # 勤怠編集画面　送信処理
-   ActiveRecord::Base.transaction do
-      @user = User.find(params[:user_id])
-  
-      attendance_edit_params.each do |id, item|
+       ActiveRecord::Base.transaction do
+          @user = User.find(params[:user_id])
       
-        if item[:who_consent].present? && item["after_started_at(4i)"].present? && item["after_started_at(5i)"].present? && item["after_finished_at(4i)"].present? && item["after_finished_at(5i)"].present?
+          attendance_edit_params.each do |key, item|
           
-            @attendance = Attendance.find(id)
-            
-            year = @attendance[:worked_on].year
-            month = @attendance[:worked_on].month
-            day = @attendance.worked_on.day
-            
-            at_after_started_at = Time.new(year.to_i, month.to_i, day.to_i, item["after_started_at(4i)"].to_i, item["after_started_at(5i)"].to_i)
-            at_after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
-            
-            at_after_started_at = nil if item["after_started_at(5i)"].blank?
-            at_after_finished_at = nil if item["after_finished_at(5i)"].blank?
-            
-            @attendance[:after_started_at] = at_after_started_at
-            @attendance[:after_finished_at] = at_after_finished_at
-        
-            @attendance[:request_at] = Time.current
-            @attendance[:request_type] = 1
-            @attendance[:request_status] = 0
-          
-            @attendance[:before_started_at] = @attendance[:started_at]
-            @attendance[:before_finished_at] = @attendance[:finished_at]
-            
-          
-            
-            
-            
-            @attendance[:who_consent] = item[:who_consent]
-        
-            @attendance[:tommorow_flag] = item[:tommorow_flag]
-            
-           
-            
-            unless (@attendance[:before_started_at] == @attendance[:after_started_at]) && (@attendance[:after_finished_at] == @attendance[:before_finished_at])
-              if @attendance.update_attributes!(update_waiting_parmas)
-               
-                flash[:success] = "勤怠変更を申請しました。承認までしばらくお待ちください。"
-                redirect_to new_user_attendance_path
-              else
-                flash.now[:danger] = "勤怠変更を申請できませんでした。"
-                redirect_to new_user_attendance_path
+            if item[:who_consent].present? && item["after_started_at(4i)"].present? && item["after_started_at(5i)"].present? && item["after_finished_at(4i)"].present? && item["after_finished_at(5i)"].present?
+              @attendance = Attendance.find(key)
+    
+                    year = @attendance[:worked_on].year
+                    month = @attendance[:worked_on].month
+                    day = @attendance.worked_on.day
+                    
+                    at_after_started_at = Time.new(year.to_i, month.to_i, day.to_i, item["after_started_at(4i)"].to_i, item["after_started_at(5i)"].to_i)
+                    at_after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
+                    
+                    at_after_started_at = nil if item["after_started_at(5i)"].blank?
+                    at_after_finished_at = nil if item["after_finished_at(5i)"].blank?
+                    
+                    @attendance[:after_started_at] = at_after_started_at
+                    @attendance[:after_finished_at] = at_after_finished_at
+                    
+              if (@attendance[:started_at] != item[:after_started_at]) && (@attendance[:finished_at] != item[:before_finished_at]) || item[:request_status] != 0
+             
+                
+                    @attendance[:request_at] = Time.current
+                   
+                    @attendance[:request_type] = 1
+                    @attendance[:request_status] = 0
+                  
+                    @attendance[:before_started_at] = @attendance[:started_at]
+                    @attendance[:before_finished_at] = @attendance[:finished_at]
+                 
+                    @attendance[:who_consent] = item[:who_consent]
+                
+                    @attendance[:tommorow_flag] = item[:tommorow_flag]
+                    
+             
+                    @attendance.save!
+                   
               end
+              
+            elsif item[:who_consent].nil? && item["after_started_at(4i)"].present? && item["after_started_at(5i)"].present? && item["after_finished_at(4i)"].present? && item["after_finished_at(5i)"].present?
+                  
+                  flash.now[:danger] = "指示者を選択してください"
+                  raise    
+            elsif item[:who_consent].present? && item["after_started_at(4i)"].nil? || item["after_started_at(5i)"].nil? || item["after_finished_at(4i)"].nil? || item["after_finished_at(5i)"].nil?
+                  
+                  flash.now[:danger] = "指示者が選択されていますが、出社時間or退社時間に不備があります。"
+                  raise
+            elsif item[:who_consent].nil? && item["after_started_at(4i)"].present? || item["after_started_at(5i)"].present? || item["after_finished_at(4i)"].present? || item["after_finished_at(5i)"].present?
+                  
+                  flash.now[:danger] = "指示者が選択されていますが、出社時間or退社時間に不備があります。"
+                  raise
             end
-        elsif item[:who_consent].nil? && item["after_started_at(4i)"].present? && item["after_started_at(5i)"].present? && item["after_finished_at(4i)"].present? && item["after_finished_at(5i)"].present?
-          
-          flash.now[:danger] = "指示者を選択してください"
-          raise
-        elsif item[:who_consent].present? && (item["after_started_at(4i)"].present? || item["after_started_at(5i)"].present?) && (item["after_finished_at(4i)"].present? || item["after_finished_at(5i)"].present?)
-          flash.now[:danger] = "時と分は両方を入力してください"
-          raise
-        end   
-      end
-   rescue ActiveRecord::RecordInvalid
+          end
+       end
+       flash[:success] = "変更申請を送信しました。承認まで今しばらくお待ちください。"
+       redirect_to user_attendances_edit_path
+  rescue ActiveRecord::RecordInvalid
      flash.now[:danger] = "無効な入力データがあった為、更新をキャンセルしました。"
      render :edit
-   rescue RuntimeError
-     flash.now[:danger] = "無効な入力データがあった為、更新をキャンセルしました。(指示者を選択してください。)"
-     render :edit
-   end
+  rescue RuntimeError
+     redirect_to user_attendances_edit_path, flash: { danger: "無効な入力データがあったため、登録出来ませんでした。" } and return
   end
   
   
@@ -568,6 +567,6 @@ class AttendancesController < ApplicationController
     def update_waiting_parmas #勤怠編集画面更新時 承認待ちにするカラムの処理
       params.permit(:after_started_at, :after_finished_at, :request_at, :request_type, :request_status, :before_started_at, :before_finished_at, :who_consent, :tommorow_flag)
     end
-
-  
+    
+    
 end

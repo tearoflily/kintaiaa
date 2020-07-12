@@ -16,7 +16,7 @@
 				</td>
 			<td>指定勤務開始時間：<%= l(@user.designated_work_start_time, format: "%-H:%M") %></td>
 			<td colspan="3" rowspan="2">基本時間：<%= l(@user.basic_work_time, format: "%-H:%M") %></td>
-			<td rowspan="2">初日：<%= @first_day %></td>
+			<td rowspan="2">初日：<%= l(@first_day, format: :short) %></td>
 		</tr>
 		<tr>
 			<td>指定勤務終了時間：<%= l(@user.designated_work_end_time, format: "%-H:%M") %></td>
@@ -25,9 +25,9 @@
 			<td>所属：<%= @user.affiliation %></td>
 			<td>氏名：<%= @user.name %></td>
 			<td>コード</td>
-			<td>---</td>
+			<td><%= @user.uid %></td>
 			<td>出勤日数</td>
-			<td>締め：<%= @first_day.end_of_month %></td>
+			<td>締め：<%= l(@first_day.end_of_month, format: :short) %></td>
 		</tr>
 	</tbody>
 </table>
@@ -71,18 +71,19 @@
 	</div>
 <% end %>
 
-
-<div>
-	<%= link_to "勤怠編集", user_attendances_edit_path(user_id: @user.id, date: @first_day), class:"btn btn-primary btn-sm" %>
-</div>
-
-<div>
-	<%= link_to "勤怠ロ修正ログ(承認済)", attendance_log_user_attendances_path(current_user), class:"btn btn-primary btn-sm" %>
-</div>
-
-<div>
-	<%= link_to "CSV出力", new_user_attendance_path(current_user, format: :csv), class:"btn btn-primary btn-sm" %>
-</div>
+<% if params[:format].nil? %>
+	<div>
+		<%= link_to "勤怠編集", user_attendances_edit_path(user_id: @user.id, date: @first_day), class:"btn btn-primary btn-sm" %>
+	</div>
+	
+	<div>
+		<%= link_to "勤怠ロ修正ログ(承認済)", attendance_log_user_attendances_path(current_user), class:"btn btn-primary btn-sm" %>
+	</div>
+	
+	<div>
+		<%= link_to "CSV出力", new_user_attendance_path(current_user, format: :csv), class:"btn btn-primary btn-sm" %>
+	</div>
+<% end %>
 
 <br>
 

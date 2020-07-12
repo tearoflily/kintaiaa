@@ -23,6 +23,10 @@ ja:
           worked_on: 日付
           started_at: 出勤時間
           finished_at: 退勤時間
+          after_started_at: 出勤時間
+          after_finished_at: 退勤時間
+          before_started_at: 出勤時間
+          before_finished_at: 退勤時間
           note: 備考
           user: ユーザーID
           work_change_now: 勤怠編集中データ

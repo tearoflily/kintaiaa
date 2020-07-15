@@ -3,11 +3,9 @@ module BasesHelper
   
   def base_type(type)
     if type == "0"
-      return 'タイプA'
+      return '出勤'
     elsif type == "1"
-      return 'タイプB'
-    elsif type == "2"
-      return 'タイプC'
+      return '退勤'
     end
   end
   

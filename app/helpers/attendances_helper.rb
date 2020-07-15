@@ -61,39 +61,53 @@ module AttendancesHelper
   
   
   def zishazikan(start_time, finish_time, tommorow)
-    start = (start_time.hour * 60) + start_time.min
-    s_finish = (finish_time.hour * 60) + finish_time.min
+    hour = finish_time.hour - start_time.hour
+    min = finish_time.min - start_time.min
+    hour = ( hour + 24 ) if tommorow == "1"
     
-    if tommorow == "1"
-      finish = s_finish + 720 
-    elsif tommorow == "0" || tommorow == nil
-      finish = s_finish + 0
+    if min < 0
+      min = min + 60
+      hour = hour - 1
     end
-    
-    sum_min = finish.to_i - start.to_i
-    sum_hour = sum_min / 60.00
-    sum_string = sum_hour.round(3).to_s
-    sum_array = sum_string.split(".")
-    sum_min_min = sum_array[1].to_i * 0.06
-    @sum_time = sum_array[0] + ":" + format("%02d",sum_min_min)
 
+    @sum_time = hour.to_s + ":" + format("%02d",min).to_s
+  
     return @sum_time
 
   end
   
-  def zaisha(finish, start)
-    finish = finish
-    start = start
-    format("%.2f", (((finish - start) / 60) / 60))
+  def zaisha(start_time, finish_time, tommorow)
+    hour = finish_time.hour - start_time.hour
+    min = finish_time.min - start_time.min
+    hour = ( hour + 24 ) if tommorow == "1"
+    
+    if min < 0
+      min = min + 60
+      hour = hour - 1
+    end
+    @sum_time = {}
+    @sum_time[:hour] = hour
+    @sum_time[:min] = min
+    
+    return @sum_time
   end
   
-  def view_sum(time)
+  def view_sum(hour, min)
 
-    time_f = time.to_s
-    sum_array = time_f.split(".")
-    sum_min_min = sum_array[1].to_i / 166.6 * 100
-    @sum_time = sum_array[0] + ":" + format("%02d",sum_min_min)
+    time = hour * 60.0 + min
+    sum_time = time / 60.00.to_f
+    sum_zero = format("%.2f",sum_time)
+    array_time = sum_zero.to_s.split(".")
+    
+   
+    
+    string_hour = array_time[0]
+    time_min = array_time[1].to_i * 0.60
+    time_min_round = time_min.round(0)
 
+    
+    @sum_time = string_hour.to_s + ":" + format("%02d",time_min_round).to_s
+    
     return @sum_time
   end
  

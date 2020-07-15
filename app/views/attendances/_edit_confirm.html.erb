@@ -83,7 +83,7 @@
       									<% end %>
       									
       									<td><%= day.after_finished_at.min %></td>
-      									<td><%= day.note %></td>
+      									<td><%= day.note_temporary %></td>
       									<td><%= atn.select :request_status, [['なし', 3],['申請中', 0],['承認', 1],['否認', 2]] %></td><!--  なし：nil　申請中:0　承認:1　否認:2 -->
       									<td class="active"><%= atn.check_box :ok_flag %></td>
       									<td><%= link_to '確認', new_user_attendance_path(key, 'work_view'), class:"btn btn-primary" %></td>

@@ -56,7 +56,7 @@
                               			    <%= "翌日" %>
                               			  <% end %>
                               			  <%= l(day.finished_at, format: :time) %></td>
-                              			<td><%= day.note %></td>
+                              			<td><%= day.note_temporary %></td>
                               			<td>
                               			  <% if day.tommorow_flag == "1" %>
                               			  <%= atn.hidden_field :tommorow_flag, :value => day.tommorow_flag %>

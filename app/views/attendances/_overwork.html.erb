@@ -47,7 +47,7 @@
               		<tr>
               			<td><%= l(@attendance.worked_on, format: :short) %></td>
               			<td><%= $days_of_the_week[@attendance.worked_on.wday] %></td>
-              			<td><%= f.datetime_select :after_finished_at, { :default => @attendance.finished_at , :discard_year => true,  :discard_month => true, :discard_day => true } %></td>
+              			<td><%= f.datetime_select :after_finished_at, { :include_blank => true, :discard_year => true,  :discard_month => true, :discard_day => true } %></td>
               			
               			<td>
               			<% if @attendance.tommorow == "1" %>
@@ -57,9 +57,9 @@
               			<% end %>  
               			</td>
               			 
-              			<td><%= f.text_field :note %></td>
+              			<td><%= f.text_field :note_temporary %></td>
               			<td>
-              			  <%= f.collection_select :who_consent, User.where(superior: true).where.not(id: current_user.id), :id, :name, {include_blank: '選択してください' }, :prompt => true %> 
+              			  <%= f.collection_select :who_consent, User.where(superior: true).where.not(id: current_user.id).where.not(admin: true), :id, :name, {:include_blank => true }, :prompt => false %> 
             		  	</td>
               		</tr>
               		

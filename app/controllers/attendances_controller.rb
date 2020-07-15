@@ -1,10 +1,12 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now]
-
+  # before_action :no_access_current_user, only: [:new, :create, :edit, :update_waiting]
+  
   before_action :logged_in_user
-  before_action :admin_or_correct_user, only: [:new, :create, :month_confirmation_create, :edit]
+  before_action :admin_or_correct_user, only: [:create, :month_confirmation_create]
   before_action :correct_user, only: [:create, :attendance_log, :attendance_log_delete, :month_confirmation_create, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
-  before_action :admin_user, only: [:month_confirmation, :month_confirmation_update, :working_now]
+  before_action :admin_user, only: [:working_now]
+  before_action :admin_or_superior_user, only: [:new, :create, :edit, :update_waiting]
   before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update]
   before_action :set_select_who_consent, only: [:edit, :update_waiting]
 
@@ -121,7 +123,7 @@ class AttendancesController < ApplicationController
   end
   
   def set_select_who_consent
-    @select_attendance = User.where(superior: true).where.not(id: current_user.id)
+    @select_attendance = User.where(superior: true).where.not(id: current_user.id).where.not(admin: true)
   end
   
 
@@ -149,8 +151,9 @@ class AttendancesController < ApplicationController
                     
                     @attendance[:after_started_at] = at_after_started_at
                     @attendance[:after_finished_at] = at_after_finished_at
-                    
-              if (@attendance[:started_at] != item[:after_started_at]) && (@attendance[:finished_at] != item[:before_finished_at]) || item[:request_status] != 0
+              
+
+              unless (@attendance[:started_at] == @attendance[:after_started_at]) && (@attendance[:finished_at] == @attendance[:after_finished_at])
              
                 
                     @attendance[:request_at] = Time.current
@@ -164,7 +167,7 @@ class AttendancesController < ApplicationController
                     @attendance[:who_consent] = item[:who_consent]
                 
                     @attendance[:tommorow_flag] = item[:tommorow_flag]
-                    
+                    @attendance[:note_temporary] = item[:note_temporary]
              
                     @attendance.save!
                    
@@ -231,17 +234,15 @@ class AttendancesController < ApplicationController
                 @new_attendance[:request_at] = Time.current
           
                 @new_attendance[:worked_on] = attendance[:worked_on]
-                @new_attendance[:note] = attendance.note
+                @new_attendance[:note] = attendance.note_temporary
                 @new_attendance[:request_type] = attendance.request_type
                 @new_attendance[:request_status] = 1
                
-                at_after_tommorow_flag = attendance[:tommorow_flag]
-         
-                if attendance[:tommorow].present?
-                  @new_attendance[:tommorow_flag] = attendance[:tommorow]
-                end
+      
+                @new_attendance[:tommorow] = attendance[:tommorow_flag]
+                @new_attendance[:tommorow_flag] = attendance[:tommorow]
+  
                 
-                @new_attendance[:tommorow] = at_after_tommorow_flag
                 @new_attendance[:only_day] = 1
                 
                 @new_attendance.save!
@@ -251,13 +252,16 @@ class AttendancesController < ApplicationController
                 attendance[:request_at] = Time.current
                 attendance[:request_type] = attendance.request_type
                 attendance[:only_day] = nil
+                attendance[:note] = attendance[:note_temporary]
                 attendance[:request_status] = "3"
-                
-             
-                if attendance.save!
+                attendance[:tommorow] = attendance[:tommorow]
+              
+                if attendance.save!(context: :hoge)
                   flash[:success] = "承認が完了しました"
+              
                 else  
                   flash[:danger] = "更新に失敗しました"
+                  
                 end
             
               
@@ -334,11 +338,12 @@ class AttendancesController < ApplicationController
       year = @attendance.worked_on.year
       month = @attendance.worked_on.month
       day = @attendance.worked_on.day
-    
+   
       @attendance.after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, params[:attendance]["after_finished_at(4i)"].to_i, params[:attendance]["after_finished_at(5i)"].to_i)
       @attendance.after_finished_at.to_datetime
       @attendance.after_started_at = @attendance.started_at
       @attendance.request_at = Time.current
+      @attendance.note_temporary = params[:attendance][:note_temporary]
       @attendance.request_type = 2
       @attendance.request_status = 0
       @attendance.before_finished_at = @attendance.finished_at
@@ -402,11 +407,10 @@ class AttendancesController < ApplicationController
           
           at_after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, item["after_finished_at(4i)"].to_i, item["after_finished_at(5i)"].to_i)
           
-         
+          @attendance.note = attendance.note_temporary
           @attendance.finished_at = at_after_finished_at
           @attendance.who_consent = attendance.who_consent
           @attendance.worked_on = attendance[:worked_on]
-          @attendance.note = attendance.note
           @attendance.request_type = attendance.request_type
           @attendance.request_status = 1
           
@@ -422,6 +426,7 @@ class AttendancesController < ApplicationController
           attendance.request_at = Time.current
           attendance.request_status = "3"
           attendance.only_day = nil
+          attendance.note = attendance.note_temporary
       
           attendance.save
   
@@ -443,6 +448,7 @@ class AttendancesController < ApplicationController
           attendance.before_finished_at = nil
           attendance.request_at = nil
           attendance.request_type = 1
+          attendance.note_temporary = nil
           attendance.tommorow_flag = nil
           attendance.request_status = 2
           attendance.save!
@@ -545,19 +551,19 @@ class AttendancesController < ApplicationController
   private
   
     def attendance_edit_params
-      params.require(:user).permit(attendances: [:worked_on, :after_started_at, :after_finished_at, :note, :who_consent, :tommorow_flag, :tommorow])[:attendances]
+      params.require(:user).permit(attendances: [:worked_on, :after_started_at, :after_finished_at, :note_temporary, :who_consent, :tommorow_flag, :tommorow])[:attendances]
     end
     
     def update_edit_params
-      params.require(:user).permit(attendances: [:worked_on, :request_status, :ok_flag, :only_day, :tommorow, :tommorow_flag])[:attendances]
+      params.require(:user).permit(attendances: [:worked_on, :request_status, :ok_flag, :only_day, :tommorow, :tommorow_flag, :note_temporary, :note])[:attendances]
     end
     
     def overwork_edit_params
-      params.permit(:after_finished_at, :tommorow_flag, :note, :who_consent)
+      params.permit(:after_finished_at, :tommorow_flag, :note_temporary, :who_consent)
     end
     
     def update_overwork_edit_params
-      params.require(:user).permit(attendances: [:worked_on, :after_finished_at, :request_status, :tommorow, :tommorow_flag])[:attendances]
+      params.require(:user).permit(attendances: [:worked_on, :after_finished_at, :request_status, :tommorow, :tommorow_flag, :note_temporary])[:attendances]
     end
     
     def update_month_edit_params
@@ -565,8 +571,20 @@ class AttendancesController < ApplicationController
     end
     
     def update_waiting_parmas #勤怠編集画面更新時 承認待ちにするカラムの処理
-      params.permit(:after_started_at, :after_finished_at, :request_at, :request_type, :request_status, :before_started_at, :before_finished_at, :who_consent, :tommorow_flag)
+      params.permit(:after_started_at, :after_finished_at, :request_at, :request_type, :request_status, :before_started_at, :before_finished_at, :note_temporary, :who_consent, :tommorow_flag)
     end
     
+    def no_access_current_user
+     redirect_to root_url if @user == current_user
+     flash[:danger] = "自身の勤怠、編集ページにはアクセスできません。"
+    end
+    
+    def admin_or_superior_user
+      @user = User.find(params[:user_id]) if @user.blank?
+      unless current_user.superior? || current_user.admin?
+        flash[:danger] = "編集権限がありません。"
+        redirect_to root_url
+      end
+    end
     
 end

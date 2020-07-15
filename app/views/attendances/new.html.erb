@@ -1,5 +1,6 @@
-<% @sum = 0 %>
-
+<% @sum_hour = 0 %>
+<% @sum_min = 0 %>
+<% @at = [] %>
 <table class="table table-bordered table-condensed table-hover" id="table-attendances">
 	<tbody>
 		<tr>
@@ -140,7 +141,7 @@
 					<td><%= l(day.started_at, format: :minut) if day.started_at.present? %></td>
 					<td>
 					<% if params[:format].nil? %>	
-						<% if (Date.current == day.worked_on) && day.started_at.nil? %>
+						<% if (Date.current == day.worked_on) && day.started_at.nil? && day.finished_at.nil? %>
 						<%= link_to "出勤登録", user_attendances_path(user_id: params[:user_id], dayid: day.worked_on), method: :create %>
 						<% end %>
 					<% end %>
@@ -158,13 +159,13 @@
 					<td><%= l(day.finished_at, format: :minut) if day.finished_at.present? %></td>
 					<td>
 					<% if params[:format].nil? %>	
-						<% if (Date.current == day.worked_on) && day.finished_at.nil? %>
+						<% if (Date.current == day.worked_on) && day.finished_at.nil? && day.started_at.present? %>
 						<%= link_to "退勤登録", user_attendances_path(user_id: params[:user_id], dayid: day.worked_on), method: :create %>
 						<% end %>
 					<% end %>
 					</td>
 					<td><%= zishazikan(day.started_at, day.finished_at, day.tommorow) if day.started_at.present? && day.finished_at.present? %></td>
-					<td></td>
+					<td><%= day.note %></td>
 					<td></td>
 					<td></td>
 					<td></td>
@@ -177,8 +178,11 @@
 		</tr>
 
 			<% if day.started_at.present? && day.finished_at.present? && day.only_day == 1 %>
-			          <% @i = zaisha(day.finished_at, day.started_at).to_f %>
-			          <% @sum += @i %>
+			          <% @i = zishazikan(day.started_at, day.finished_at, day.tommorow) %>
+			         
+			          <% @at = @i.split(":") %>
+			          <% @sum_hour += @at[0].to_i %>
+			        	<% @sum_min += @at[1].to_i %>
 			<% end %>
 
 	<% end %>
@@ -189,7 +193,7 @@
 			<% end %>
 			<td colspan="2"></td>
 			<td colspan="6"></td>
-			<td><%= view_sum(@sum) %></td>
+			<td><%= view_sum(@sum_hour, @sum_min) %></td>
 			<td colspan="5"></td>
 			<td>
 
@@ -197,7 +201,7 @@
 				<% if @attendances.first.month_work == nil %>
 						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
 							<div>所属長承認</div>
-							<div><%= f.collection_select :month_work_who_consent, User.where(admin: true), :id, :name, {include_blank: '選択' }, :prompt => true %> </div>
+							<div><%= f.collection_select :month_work_who_consent, User.where(superior: true), :id, :name, {include_blank: '選択' }, :prompt => true %> </div>
 							<div><%= f.submit "申請", class:"btn btn-primary" %></div>
 						<% end %>
 				<% elsif @attendances.first.month_work == 0 %>

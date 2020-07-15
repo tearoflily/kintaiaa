@@ -86,9 +86,14 @@ class UsersController < ApplicationController
       end
     end
     
+
+    
+    
     def correct_user
       redirect_to(root_url) unless current_user?(@user)
     end
+    
+
   
   
   

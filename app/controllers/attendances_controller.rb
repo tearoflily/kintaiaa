@@ -576,7 +576,7 @@ class AttendancesController < ApplicationController
     
     def no_access_admin
      redirect_to root_url if current_user.admin
-     flash[:danger] = "管理者は地震の編集ページにはアクセスできません。"
+     flash.now[:danger] = "管理者は自身の編集ページにはアクセスできません。"
     end
     
     def admin_or_superior_user

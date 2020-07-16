@@ -16,7 +16,7 @@
         <% end %>
         
         <% if current_user.present? && !admin_user?(current_user.id) %>
-        <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user.id) %></li>
+          <li><%= link_to "勤怠一覧", new_user_attendance_path(current_user.id) %></li>
         <% end %>
         
         <% if current_user.present? %>

@@ -1,6 +1,6 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now]
-  before_action :no_access_current_user, only: [:new, :create, :edit, :update_waiting]
+  before_action :no_access_admin, only: [:new, :create, :edit, :update_waiting]
   
   before_action :logged_in_user
   before_action :admin_or_correct_user, only: [:create, :month_confirmation_create]
@@ -574,9 +574,9 @@ class AttendancesController < ApplicationController
       params.permit(:after_started_at, :after_finished_at, :request_at, :request_type, :request_status, :before_started_at, :before_finished_at, :note_temporary, :who_consent, :tommorow_flag)
     end
     
-    def no_access_current_user
-     redirect_to root_url if @user == current_user
-     flash[:danger] = "自身の勤怠、編集ページにはアクセスできません。"
+    def no_access_admin
+     redirect_to root_url if current_user.admin
+     flash[:danger] = "管理者は地震の編集ページにはアクセスできません。"
     end
     
     def admin_or_superior_user

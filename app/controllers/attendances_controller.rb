@@ -1,4 +1,14 @@
 class AttendancesController < ApplicationController
+  before_action :set_one_month, except: [:working_now]
+  before_action :no_access_current_user, only: [:new, :create, :edit, :update_waiting]
+  
+  before_action :logged_in_user
+  before_action :admin_or_correct_user, only: [:create, :month_confirmation_create]
+  before_action :correct_user, only: [:create, :attendance_log, :attendance_log_delete, :month_confirmation_create, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :admin_user, only: [:working_now]
+  before_action :admin_or_superior_user, only: [:new, :create, :edit, :update_waiting]
+  before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update]
+  before_action :set_select_who_consent, only: [:edit, :update_waiting]
 
   
 

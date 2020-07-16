@@ -1,8 +1,5 @@
 class UsersController < ApplicationController
-  before_action :logged_in_user, only: [:index, :edit, :update, :import, :destroy]
-  before_action :admin_user, only: [:index, :edit, :update, :import]
-  
-  
+ 
   
   def index
     @users = User.all

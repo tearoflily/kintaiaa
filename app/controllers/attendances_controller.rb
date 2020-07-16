@@ -570,7 +570,7 @@ class AttendancesController < ApplicationController
       params.require(:user).permit(attendances: [:month, :month_work, :ok_flag])[:attendances]
     end
     
-    def update_waiting_parmas #勤怠編集画面更新時 承認待ちにするカラムの処理
+    def update_waiting_parmas 
       params.permit(:after_started_at, :after_finished_at, :request_at, :request_type, :request_status, :before_started_at, :before_finished_at, :note_temporary, :who_consent, :tommorow_flag)
     end
     

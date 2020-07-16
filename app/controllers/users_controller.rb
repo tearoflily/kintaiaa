@@ -86,7 +86,13 @@ class UsersController < ApplicationController
       end
     end
     
-
+    def admin_or_superior_user
+      @user = User.find(params[:user_id]) if @user.blank?
+      unless current_user.superior? || current_user.admin?
+        flash[:danger] = "編集権限がありません。"
+        redirect_to root_url
+      end
+    end
     
     
     def correct_user

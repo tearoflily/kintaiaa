@@ -1,6 +1,6 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now]
-  # before_action :no_access_current_user, only: [:new, :create, :edit, :update_waiting]
+  before_action :no_access_current_user, only: [:new, :create, :edit, :update_waiting]
   
   before_action :logged_in_user
   before_action :admin_or_correct_user, only: [:create, :month_confirmation_create]

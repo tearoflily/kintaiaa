@@ -1,0 +1,6 @@
+name,email,affiliation,employee_number,uid,basic_work_time,designated_work_start_time,designated_work_end_time,superior,admin,password
+管理者,sample@email.com,csv部,0,x0,8:00,8:30,17:00,TRUE,TRUE,password
+上長ユーザー1,zyotyo1@email.com,csv部,1,x1,8:00,8:30,17:00,TRUE,FALSE,password
+上長ユーザー2,zyotyo2@email.com,csv部,2,x2,8:00,8:30,17:00,TRUE,FALSE,password
+一般ユーザー1,ippan1@email.com,csv部,3,x3,8:00,8:30,17:00,FALSE,FALSE,password
+一般ユーザー2,ippan2@email.com,csv部,4,x4,8:00,8:30,17:00,FALSE,FALSE,password

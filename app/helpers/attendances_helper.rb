@@ -110,5 +110,26 @@ module AttendancesHelper
     
     return @sum_time
   end
+  
+  
+  def zikangai(after_finished_at, user_id, tommorow)
+
+    finished_at = Time.new(2020, 8, 1, after_finished_at.hour, after_finished_at.min, 0, "+09:00")
+
+
+    if tommorow == "1"
+      finished_at = finished_at + 24.hour
+    end
+    
+    user = User.find(user_id)
+    designated_work_end_time = Time.new(2020, 8, 1, user.designated_work_end_time.hour, user.designated_work_end_time.min, 0, "+09:00")
+    
+    
+    time = finished_at - designated_work_end_time
+    
+    sa = Time.at(time).utc.strftime('%X')
+   
+    return sa.slice(0..4)
+  end
  
 end

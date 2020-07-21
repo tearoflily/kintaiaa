@@ -36,10 +36,15 @@
                       		<tr>
                       			<th>日付</th>
                       			<th>曜日</th>
+               
                       			<th>終了予定時間</th>
+                      			<th>指定勤務終了時間</th>
+                      			<th>時間外時間</th>
                       			<th>業務処理内容</th>
-                      			<th>終了指示時間</th>
+                      			
                       			<th>指示確認印</th>
+                      			<th>変更</th>
+                      			<th>勤怠を確認する</th>
                       		</tr>
                       		
                       		<% attendances.each do |day| %>
@@ -51,19 +56,21 @@
                               			<td><%= l(day.worked_on, format: :short) %></td>
                               			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
                               			
-                              			<td>
-                              			  <% if day.tommorow == "1" %>
-                              			    <%= "翌日" %>
-                              			  <% end %>
-                              			  <%= l(day.finished_at, format: :time) %></td>
-                              			<td><%= day.note_temporary %></td>
+                              		
+                              			
                               			<td>
                               			  <% if day.tommorow_flag == "1" %>
                               			  <%= atn.hidden_field :tommorow_flag, :value => day.tommorow_flag %>
                               			    <%= "翌日" %>
                               			  <% end %>
-                              			  <%= atn.datetime_select :after_finished_at, { :discard_year => true,  :discard_month => true, :discard_day => true , selected: day.after_finished_at, include_blank: true } %></td>
-                              			<td><%= atn.select :request_status, [['申請中', 0],['承認', 1],['否認', 2]] %></td>
+                              			  <%= l(day.after_finished_at, format: :short2) %>
+                              			</td>
+                              			<td><%= l(User.find(day.user_id).designated_work_end_time, format: :short2) %></td>
+                              			<td><%= zikangai(day.after_finished_at, day.user_id, day.tommorow_flag) %></td>
+                              			<td><%= day.note_temporary %></td>
+                              			<td><%= atn.select :request_status, [['申請中', 0],['承認', 1],['否認', 2],['なし', 8]] %></td>
+                              			<td class="active"><%= atn.check_box :ok_flag %></td>
+                              			<td><%= link_to '勤怠確認', new_user_attendance_path(day.user_id,'work_view'), class:"btn btn-primary" %></td>
                               	     </tr>
                               	     <% end %>
                               	   <% end %>

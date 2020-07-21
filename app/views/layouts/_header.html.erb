@@ -6,10 +6,10 @@
         <li><%= link_to "Top", root_path %></li>
         
         
-        
+        <li><%= link_to "ユーザー一覧", users_path %></li>
         
         <% if current_user.present? && admin_user?(current_user.id) %>
-          <li><%= link_to "ユーザー一覧", users_path %></li>
+          
           <li><%= link_to "出勤中社員一覧", working_now_path %></li>
           <li><%= link_to "拠点情報", bases_path %></li>
           <li><%= link_to "基本情報の更新", work_basic_edit_user_attendances_path(current_user) %></li>

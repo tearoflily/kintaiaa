@@ -576,11 +576,9 @@ class AttendancesController < ApplicationController
           flash[:info] = "「なし」を選択しました"
           redirect_to new_user_attendance_path(current_user) and return
         end
-        flash[:success] = "一ヶ月勤怠の承認および否認の回答が完了しました"
-        redirect_to new_user_attendance_path(current_user) and return
-
       end
-      
+      flash[:success] = "一ヶ月勤怠の承認および否認の回答が完了しました"
+      redirect_to new_user_attendance_path(current_user) and return
     end
   rescue ActiveRecord::RecordInvalid
     flash[:danger] = "一ヶ月勤怠の承認が失敗しました"

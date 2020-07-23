@@ -19,7 +19,7 @@ CSV.generate do |csv|
       at_min = at[1].to_i
       
       if at_min == 0
-       at_min = 00
+       at_min = "00"
       end
       
       at24 = at_hour + 24

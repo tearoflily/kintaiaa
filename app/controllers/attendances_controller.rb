@@ -34,7 +34,11 @@ class AttendancesController < ApplicationController
      end
     
    elsif params[:format].nil?
-     redirect_to(root_url) unless current_user?(@user)
+     unless current_user?(@user)
+       flash[:danger] = "編集権限がありません"
+       redirect_to(root_url)
+       
+     end
    end
   end
   

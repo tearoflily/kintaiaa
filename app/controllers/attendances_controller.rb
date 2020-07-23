@@ -236,7 +236,8 @@ class AttendancesController < ApplicationController
      
           item[:request_status] = item[:request_status].to_i
           if item[:ok_flag] == "0"
-            
+            flash.now[:danger] = "変更チェックボタンを押してください"
+            redirect_to new_user_attendance_path
           elsif item[:ok_flag] == "1" && item[:request_status] == 1
       
             attendance = Attendance.find_by(id: id)

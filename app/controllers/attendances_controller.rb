@@ -165,7 +165,10 @@ class AttendancesController < ApplicationController
                     
                     @attendance[:after_started_at] = at_after_started_at
                     @attendance[:after_finished_at] = at_after_finished_at
-              
+                    
+                    @attendance.request_type_before_copy = @attendance.request_type
+                    @attendance.request_status_before_copy = @attendance.request_status
+                    @attendance.request_at_before_copy = @attendance.request_at
 
               unless (@attendance[:started_at] == @attendance[:after_started_at]) && (@attendance[:finished_at] == @attendance[:after_finished_at])
              
@@ -282,7 +285,26 @@ class AttendancesController < ApplicationController
                 end
 
           elsif item[:ok_flag] == "1" && item[:request_status] == 8
-            flash.now[:success] = "勤怠情報の変更が完了していません。(「なし」を選択しています)"
+            
+            
+            
+            attendance = Attendance.find_by(id: id)
+            attendance[:after_started_at] = nil
+            attendance[:after_finished_at] = nil
+            attendance[:before_started_at] = nil
+            attendance[:before_finished_at] = nil
+            attendance[:request_at] = attendance.request_at_before_copy
+            attendance[:request_type] = attendance.request_type_before_copy
+            attendance[:note_temporary] = nil
+            attendance[:tommorow_flag] = nil
+            attendance[:request_status] = attendance.request_status_before_copy
+          
+            
+            attendance.request_type_before_copy = nil 
+            attendance.request_status_before_copy = nil
+            attendance.request_at_before_copy = nil
+          
+            attendance.save!
           elsif item[:request_status] == 2
             attendance = Attendance.find_by(id: id)
             attendance[:after_started_at] = nil
@@ -331,33 +353,41 @@ class AttendancesController < ApplicationController
   
   def attendance_log_delete
    
-    @user = User.find(params[:user_id])
-    
-    day = params[:format]
-    day_to_date = day.to_date
-    month_start = day_to_date.beginning_of_month
-    month_end = month_start.end_of_month
+    @user = User.find(current_user.id)
+      if params[:worked_on_between].present?
+        @search_date = Time.new(params[:worked_on_between][:"date(1i)"].to_i, params[:worked_on_between][:"date(2i)"].to_i, params[:worked_on_between][:"date(3i)"].to_i)
+      end
 
-    log_delete_month = @user.attendances.where(worked_on: month_start..month_end)
-    log_delete_month.each do |id, log_day|
+    @attendance = @user.attendances.order(:created_at).where("(request_status = ?)", 3).where("only_day is null").search(@search_date)
+    @attendance_default = @attendance.pluck(:worked_on).first
+   
+    # @user = User.find(params[:user_id])
     
-      attendance = Attendance.find_by(id: id)
+    # day = params[:format]
+    # day_to_date = day.to_date
+    # month_start = day_to_date.beginning_of_month
+    # month_end = month_start.end_of_month
+
+    # log_delete_month = @user.attendances.where(worked_on: month_start..month_end)
+    # log_delete_month.each do |id, log_day|
+    
+    #   attendance = Attendance.find_by(id: id)
       
-      unless attendance.only_day == 1 && attendance.started_at.nil?
-        attendance[:before_started_at] = nil
-        attendance[:before_finished_at] = nil
-        attendance[:after_started_at] = nil
-        attendance[:after_finished_at] = nil
-        attendance[:request_status] = nil
+    #   unless attendance.only_day == 1 && attendance.started_at.nil?
+    #     attendance[:before_started_at] = nil
+    #     attendance[:before_finished_at] = nil
+    #     attendance[:after_started_at] = nil
+    #     attendance[:after_finished_at] = nil
+    #     attendance[:request_status] = nil
  
   
-        attendance.save
-      end
+    #     attendance.save
+    #   end
       
       
-    end
-    redirect_to attendance_log_user_attendances_url
-    flash[:success] = "該当月のログを消去しました"
+    # end
+    # redirect_to attendance_log_user_attendances_url
+    # flash[:success] = "該当月のログを消去しました"
   end
   
   def overwork #残業申請 画面
@@ -367,14 +397,24 @@ class AttendancesController < ApplicationController
   
 
   def overwork_update #残業申請 送信処理
+  
+  
     if params[:attendance][:who_consent].present?
       @user = User.find(params[:user_id])
       @attendance = Attendance.find(params[:id])
       
+      if @attendance.started_at.blank? && @attendance.finished_at.blank?
+        flash[:danger] = "出社および退勤の登録が無いため残業申請できません"
+        redirect_to new_user_attendance_path and return
+      end
       year = @attendance.worked_on.year
       month = @attendance.worked_on.month
       day = @attendance.worked_on.day
-
+      
+      @attendance.request_type_before_copy = @attendance.request_type
+      @attendance.request_status_before_copy = @attendance.request_status
+      @attendance.request_at_before_copy = @attendance.request_at
+      
       @attendance.after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, params[:attendance]["after_finished_at(4i)"].to_i, params[:attendance]["after_finished_at(5i)"].to_i)
       
       @attendance.after_started_at = @attendance.started_at
@@ -439,10 +479,10 @@ class AttendancesController < ApplicationController
   def overwork_confirm_update #残業申請 承認処理
    
     update_overwork_edit_params.each do |id, item|
-      
+    
       item[:request_status] = item[:request_status].to_i
 
-      if item[:ok_flag] == "1" && ( item[:request_status] == 1 or item[:request_status] == 2 )
+      if item[:ok_flag] == "1" && ( item[:request_status] == 1 or item[:request_status] == 2 or item[:request_status] == 8)
     
           attendance = Attendance.find_by(id: id)
           @user = User.find_by(id: attendance.user_id)
@@ -491,6 +531,24 @@ class AttendancesController < ApplicationController
           attendance.note_temporary = nil
           attendance.tommorow_flag = nil
           attendance.request_status = 2
+        
+          attendance.save!
+        elsif item[:request_status] == 8
+        
+          attendance.after_started_at = nil
+          attendance.after_finished_at = nil
+          attendance.before_started_at = nil
+          attendance.before_finished_at = nil
+          attendance.request_at = attendance.request_at_before_copy
+          attendance.request_type = attendance.request_type_before_copy
+          attendance.note_temporary = nil
+          attendance.tommorow_flag = nil
+          attendance.request_status = attendance.request_status_before_copy
+        
+          
+          attendance.request_type_before_copy = nil 
+          attendance.request_status_before_copy = nil
+          attendance.request_at_before_copy = nil
         
           attendance.save!
         end
@@ -558,8 +616,18 @@ class AttendancesController < ApplicationController
           flash[:danger] = "「承認」or「否認」を選択してください"
 
         elsif item[:month_work] == 8 && item[:ok_flag] == "1"
-          flash[:info] = "「なし」を選択しました"
-
+          @attendance_month = Attendance.find_by(id: key)
+          @user = User.find_by(id: @attendance_month.user_id)
+          @month_start = @attendance_month.worked_on.beginning_of_month
+          @month_end = @month_start.end_of_month
+          @month = @user.attendances.where(worked_on: @month_start..@month_end)
+          @month.each do | day |
+     
+            attendance = Attendance.find(day.id)
+            attendance.month_work = nil
+            attendance.month_work_who_consent = nil
+            attendance.save!
+          end
         end
       end
       flash[:success] = "一ヶ月勤怠の承認および否認の回答が完了しました"

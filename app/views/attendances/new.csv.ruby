@@ -17,10 +17,9 @@ CSV.generate do |csv|
       at = atfn.split(":")
       at_hour = at[0].to_i
       at_min = at[1].to_i
+
       
-      if at_min == 0
-       at_min = "00"
-      end
+      at_min = "%02d" % at_min
       
       at24 = at_hour + 24
       

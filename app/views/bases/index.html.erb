@@ -11,7 +11,7 @@
 		<% if @bases.present? %>
   		<% @bases.each do | base | %>
     		<tr>
-    			<td><%= link_to '修正ボタン', edit_basis_path(base.id), class:"btn btn-primary btn-sm" %></td>
+    			<td><%= link_to '編集ボタン', edit_basis_path(base.id), class:"btn btn-primary btn-sm" %></td>
     			<td><%= link_to '削除ボタン', basis_path(base.id), method: :delete, class:"btn btn-primary btn-sm" %></td>
     			<td><%= base.base_number %></td>
     			<td><%= base.base_name %></td>
@@ -31,7 +31,7 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
-        <a data-toggle="collapse" href="#collapse1">拠点情報追加</a>
+        <a data-toggle="collapse" href="#collapse1">拠点追加のボタン</a>
       </h4>
     </div>
     <div id="collapse1" class="panel-collapse collapse">
@@ -48,7 +48,7 @@
               <td><%= form.text_field :base_name %></td>
             </tr>
             <tr>
-              <th><%= form.label :base_type, '拠点タイプ' %></th>
+              <th><%= form.label :base_type, '拠点種類' %></th>
               <td><%= form.select :base_type, [['出勤', 0],['退勤', 1]] %></td>
             </tr>
             <tr>

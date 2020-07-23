@@ -369,6 +369,7 @@ class AttendancesController < ApplicationController
       day = @attendance.worked_on.day
 
       @attendance.after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, params[:attendance]["after_finished_at(4i)"].to_i, params[:attendance]["after_finished_at(5i)"].to_i)
+      
       @attendance.after_started_at = @attendance.started_at
       @attendance.request_at = Time.current
       @attendance.note_temporary = params[:attendance][:note_temporary]
@@ -389,6 +390,7 @@ class AttendancesController < ApplicationController
         @attendance.after_finished_at = @attendance.after_finished_at + 1.days
       end
       
+
       
       if @attendance.after_finished_at > user_basic_finished_at_datetime
         @attendance.save!

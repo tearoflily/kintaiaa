@@ -214,7 +214,7 @@ class AttendancesController < ApplicationController
   
   def edit_confirm #勤怠変更の承認画面
   
-    @attendance = Attendance.where(who_consent: current_user.id)
+    @attendance = Attendance.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 1).to_a
     @attendance_user_id = @attendance.pluck(:user_id)
     @user = User.new
    
@@ -222,7 +222,7 @@ class AttendancesController < ApplicationController
     @attendance_user_id.each do |user_id|
       @user = User.find_by(id: user_id)
       @user_attendance = @user.attendances.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 1).to_a
-      
+  
       @users.merge!(user_id => @user_attendance)
     
     end
@@ -236,7 +236,7 @@ class AttendancesController < ApplicationController
      
           item[:request_status] = item[:request_status].to_i
           if item[:ok_flag] == "0"
-
+              # 書かない。複数件あったときに変更チェックしてないものはそのままにしたい
           elsif item[:ok_flag] == "1" && item[:request_status] == 1
       
             attendance = Attendance.find_by(id: id)

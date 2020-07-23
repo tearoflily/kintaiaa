@@ -534,8 +534,8 @@ class AttendancesController < ApplicationController
     ActiveRecord::Base.transaction do
       
       update_month_edit_params.each do |key, item|
-       
-        
+  
+        item[:month_work] = item[:month_work].to_i
         if item[:month_work] == 1 && item[:ok_flag] == "1"
           
           @attendance_month = Attendance.find_by(id: key)
@@ -558,7 +558,17 @@ class AttendancesController < ApplicationController
             attendance = Attendance.find(day.id)
             attendance.month_work = 2
             attendance.save!
+            redirect_to new_user_attendance_path(current_user) and return
           end
+        elsif item[:month_work] == 0 && item[:ok_flag] == "1"
+          flash[:danger] = "「承認」or「否認」を選択してください"
+          redirect_to new_user_attendance_path(current_user) and return
+        elsif item[:ok_flag] == "0"
+          flash[:danger] = "変更チェックボタンを押してください"
+          redirect_to new_user_attendance_path(current_user) and return
+        elsif item[:month_work] == 8 && item[:ok_flag] == "1"
+          flash[:info] = "「なし」を選択しました"
+          redirect_to new_user_attendance_path(current_user) and return
         end
         flash[:success] = "一ヶ月勤怠の承認および否認の回答が完了しました"
         redirect_to new_user_attendance_path(current_user) and return

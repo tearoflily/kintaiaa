@@ -33,7 +33,7 @@
                                     <%= f.fields_for "attendances[]", attendances do |attendance| %>
                                         <tr> 
                                 			<td><%= attendance.hidden_field :month, :value => attendances.worked_on %><%= attendances.worked_on.strftime('%-m月') %></td>
-                                			<td><%= attendance.select :month_work, [['申請中', 0],['承認', 1],['否認', 2]] %></td>
+                                			<td><%= attendance.select :month_work, [['申請中', 0],['承認', 1],['否認', 2],['なし', 8]] %></td>
                                 			<td class="active"><%= attendance.check_box :ok_flag %></td>
                                 			<td><%= link_to '勤怠確認', new_user_attendance_path(key,'work_view'), class:"btn btn-primary" %></td>
                                         </tr>

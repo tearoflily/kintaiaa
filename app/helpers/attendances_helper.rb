@@ -17,6 +17,14 @@ module AttendancesHelper
     return @status
   end
   
+  def month_who_confirm(who_consent)
+
+    who_consent = who_consent.to_i
+    user = User.find(who_consent)
+    return user.name
+ 
+  end  
+  
   def over24(hour)
     
     hour = hour.to_i

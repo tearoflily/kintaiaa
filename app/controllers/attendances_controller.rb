@@ -4,7 +4,7 @@ class AttendancesController < ApplicationController
   
   before_action :logged_in_user
 
-  before_action :correct_user, only: [:new, :create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :correct_user, only: [:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
   before_action :admin_user, only: [:working_now]
   before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update, :month_confirmation, :month_confirmation_update]
   before_action :set_select_who_consent, only: [:edit, :update_waiting]
@@ -32,6 +32,9 @@ class AttendancesController < ApplicationController
          
        end
      end
+    
+   elsif params[:format].nil?
+     redirect_to(root_url) unless current_user?(@user)
    end
   end
   

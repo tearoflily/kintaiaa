@@ -116,16 +116,16 @@ class AttendancesController < ApplicationController
     
         attendance[:month_work_who_consent] = params[:attendance][:month_work_who_consent]
         attendance[:month_work] = 0
-      
-        if attendance.save!
-          flash[:success] = "1ヶ月分勤怠の承認申請を送信しました。"
-          redirect_to new_user_attendance_path and return
-        else
+        attendance.save!
+      end
+      flash[:success] = "1ヶ月分勤怠の承認申請を送信しました。"
+      redirect_to new_user_attendance_path and return
+    else
           flash[:danger] = "1ヶ月分勤怠の承認申請を送信できませんでした。"
           render :new
-        end
-      end
-    end 
+    end
+      
+
     
   end
   

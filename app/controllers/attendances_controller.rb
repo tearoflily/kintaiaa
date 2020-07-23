@@ -572,9 +572,6 @@ class AttendancesController < ApplicationController
         elsif item[:month_work] == 0 && item[:ok_flag] == "1"
           flash[:danger] = "「承認」or「否認」を選択してください"
           redirect_to new_user_attendance_path(current_user) and return
-        elsif item[:ok_flag] == "0"
-          flash[:danger] = "変更チェックボタンを押してください"
-          redirect_to new_user_attendance_path(current_user) and return
         elsif item[:month_work] == 8 && item[:ok_flag] == "1"
           flash[:info] = "「なし」を選択しました"
           redirect_to new_user_attendance_path(current_user) and return

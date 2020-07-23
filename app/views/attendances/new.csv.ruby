@@ -17,7 +17,13 @@ CSV.generate do |csv|
       at = atfn.split(":")
       at_hour = at[0].to_i
       at_min = at[1].to_i
+      
+      if at_min == 0
+       at_min = 00
+      end
+      
       at24 = at_hour + 24
+      
       time = at24.to_s << ":" << at_min.to_s
     elsif attendance.finished_at.present? && attendance.tommorow == "0"
       time = attendance.finished_at.strftime("%H:%M") 

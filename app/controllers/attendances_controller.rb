@@ -480,7 +480,6 @@ class AttendancesController < ApplicationController
 
           @attendance.save!
 
-          
         elsif item[:request_status] == 2
 
           attendance.after_started_at = nil

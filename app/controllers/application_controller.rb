@@ -39,7 +39,10 @@ class ApplicationController < ActionController::Base
   end
   
   def correct_user
-    redirect_to(root_url) unless current_user?(@user)
+    unless current_user?(@user)
+        flash[:danger] = "ログイン中のユーザー自身の勤怠画面のみ表示可能です。"
+        redirect_to root_url
+    end
   end
   
   def superior_user
@@ -47,7 +50,10 @@ class ApplicationController < ActionController::Base
   end
   
   def admin_user
-    redirect_to root_url unless current_user.admin?
+    unless current_user.admin
+        flash[:danger] = "管理者のみ操作可能です。"
+        redirect_to root_url
+    end
   end
   
   def admin_or_correct_user

@@ -9,7 +9,9 @@ CSV.generate do |csv|
   @now_attendances  = @attendances.where(only_day: 1)
 
   @now_attendances.each do |attendance|
+
     atst = attendance.started_at.strftime("%H:%M") if attendance.started_at.present?
+
     if attendance.finished_at.present? && attendance.tommorow == "1"
       atfn = attendance.finished_at.strftime("%H:%M") 
       at = atfn.split(":")
@@ -18,6 +20,8 @@ CSV.generate do |csv|
       at24 = at_hour + 24
       time = at24.to_s << ":" << at_min.to_s
     elsif attendance.finished_at.present? && attendance.tommorow == "0"
+      time = attendance.finished_at.strftime("%H:%M") 
+    elsif attendance.finished_at.present? && attendance.tommorow == nil
       time = attendance.finished_at.strftime("%H:%M") 
     else
     end

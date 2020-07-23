@@ -1,5 +1,5 @@
 class BasesController < ApplicationController
-  before_action :logged_in_user
+
   before_action :admin_user
 
   
@@ -37,6 +37,9 @@ private
   def base_params
     params.require(:base).permit(:base_number, :base_name, :base_type)
   end
+  
+  
+
 
   
 end

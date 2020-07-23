@@ -61,8 +61,8 @@
       									
       									<td><%= day.before_started_at.hour if day.before_started_at.present? %></td>
       									<td><%= day.before_started_at.min if day.before_started_at.present? %></td>
-      									
-      									<% if day.before_finished_at.present? && day.tommorow == "0" %>
+      						
+      									<% if day.before_finished_at.present? && (day.tommorow == "0" || day.tommorow == nil) %>
       										<td><%= day.before_finished_at.hour %></td>
       									<% elsif day.before_finished_at.present? && day.tommorow == "1" %>
       										<td><%= over24(day.before_finished_at.hour) %></td>
@@ -84,7 +84,7 @@
       									
       									<td><%= day.after_finished_at.min %></td>
       									<td><%= day.note_temporary %></td>
-      									<td><%= atn.select :request_status, [['なし', 3],['申請中', 0],['承認', 1],['否認', 2]] %></td><!--  なし：nil　申請中:0　承認:1　否認:2 -->
+      									<td><%= atn.select :request_status, [['なし', 8],['申請中', 0],['承認', 1],['否認', 2]] %></td><!--  なし：nil　申請中:0　承認:1　否認:2 -->
       									<td class="active"><%= atn.check_box :ok_flag %></td>
       									<td><%= link_to '確認', new_user_attendance_path(key, 'work_view'), class:"btn btn-primary" %></td>
       								<% end %>

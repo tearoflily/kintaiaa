@@ -1,4 +1,13 @@
 class AttendancesController < ApplicationController
+  before_action :set_one_month, except: [:working_now]
+  before_action :no_access_admin, only: [:new, :create, :edit, :update_waiting]
+  
+  before_action :logged_in_user
+
+  before_action :correct_user, only: [:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :admin_user, only: [:working_now]
+  before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update, :month_confirmation, :month_confirmation_update]
+  before_action :set_select_who_consent, only: [:edit, :update_waiting]
 
   
 
@@ -208,7 +217,7 @@ class AttendancesController < ApplicationController
       @user_attendance = @user.attendances.where(who_consent: current_user.id).where(request_status: 0).where(request_type: 1).to_a
       
       @users.merge!(user_id => @user_attendance)
-      
+    
     end
     
 
@@ -217,8 +226,11 @@ class AttendancesController < ApplicationController
   def update #勤怠変更承認時の処理
     ActiveRecord::Base.transaction do
       update_edit_params.each do |id, item|
+     
           item[:request_status] = item[:request_status].to_i
-          if item[:ok_flag] == "1" && item[:request_status] == 1
+          if item[:ok_flag] == "0"
+            
+          elsif item[:ok_flag] == "1" && item[:request_status] == 1
       
             attendance = Attendance.find_by(id: id)
             @user = User.find_by(id: attendance.user_id)
@@ -261,17 +273,36 @@ class AttendancesController < ApplicationController
                   flash[:danger] = "更新に失敗しました"
                   
                 end
+
+          elsif item[:ok_flag] == "1" && item[:request_status] == 8
+            flash.now[:success] = "勤怠情報の変更が完了していません。(「なし」を選択しています)"
+          elsif item[:request_status] == 2
+            attendance = Attendance.find_by(id: id)
+            attendance[:after_started_at] = nil
+            attendance[:after_finished_at] = nil
+            attendance[:before_started_at] = nil
+            attendance[:before_finished_at] = nil
+            attendance[:request_at] = nil
+            attendance[:request_type] = 1
+            attendance[:note_temporary] = nil
+            attendance[:tommorow_flag] = nil
+            attendance[:request_status] = 2
+          
+            attendance.save!
+
             
-              
           end
           
           
       end
     end
-    redirect_to new_user_attendance_path, flash: { success: "勤怠情報の変更が完了しました" }
+    redirect_to new_user_attendance_path, flash: { success: "勤怠情報の承認or否認の回答が完了しました" }
   rescue ActiveRecord::RecordInvalid
     flash.now[:danger] = "勤怠情報の変更が完了していません。"
     redirect_to new_user_attendance_path
+  rescue RuntimeError
+    
+    redirect_to new_user_attendance_path, flash: { danger: "勤怠情報の変更が完了していません。入力に不備があります" }
   end
   
   
@@ -336,7 +367,7 @@ class AttendancesController < ApplicationController
       year = @attendance.worked_on.year
       month = @attendance.worked_on.month
       day = @attendance.worked_on.day
-   
+
       @attendance.after_finished_at = Time.new(year.to_i, month.to_i, day.to_i, params[:attendance]["after_finished_at(4i)"].to_i, params[:attendance]["after_finished_at(5i)"].to_i)
       @attendance.after_started_at = @attendance.started_at
       @attendance.request_at = Time.current
@@ -348,9 +379,23 @@ class AttendancesController < ApplicationController
       @attendance.tommorow_flag = params[:attendance][:tommorow_flag]
       @attendance.who_consent = params[:attendance][:who_consent]
     
-    
-      if @attendance.save
+      user_finished_at = User.find(@attendance.user_id)
+      month = @attendance.worked_on
+      
+      user_basic_finished_at_datetime = DateTime.new(month.year.to_i, month.month.to_i, month.day.to_i, user_finished_at.designated_work_end_time.hour.to_i, user_finished_at.designated_work_end_time.min.to_i, user_finished_at.designated_work_end_time.sec.to_i, "JST")
+
+      
+      if @attendance.tommorow_flag == "1"
+        @attendance.after_finished_at = @attendance.after_finished_at + 1.days
+      end
+      
+      
+      if @attendance.after_finished_at > user_basic_finished_at_datetime
+        @attendance.save!
         flash[:success] = "残業申請を送信しました"
+        redirect_to new_user_attendance_path
+      elsif @attendance.after_finished_at < user_basic_finished_at_datetime
+        flash[:danger] = "残業の申請時間に不備があります(基本勤務終了時間を超えた時間で申請してください)"
         redirect_to new_user_attendance_path
       else
         flash[:danger] = "残業申請を送信できませんでした"
@@ -441,7 +486,7 @@ class AttendancesController < ApplicationController
           attendance.before_started_at = nil
           attendance.before_finished_at = nil
           attendance.request_at = nil
-          attendance.request_type = 1
+          attendance.request_type = 2
           attendance.note_temporary = nil
           attendance.tommorow_flag = nil
           attendance.request_status = 2

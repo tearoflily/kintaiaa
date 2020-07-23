@@ -478,16 +478,9 @@ class AttendancesController < ApplicationController
 
           attendance.save!
 
-          if @attendance.save!
-            
-            flash[:success] = "残業申請の承認が完了しました"
-            redirect_to(new_user_attendance_url) and return
-           
-          else
-            flash[:danger] = "残業申請の承認が完了していません。"
-            session[:error] = @attendance.errors.full_messages
-            redirect_to overwork_confirm_user_attendances_path and return
-          end 
+          @attendance.save!
+
+          
         elsif item[:request_status] == 2
 
           attendance.after_started_at = nil
@@ -501,27 +494,18 @@ class AttendancesController < ApplicationController
           attendance.request_status = 2
         
           attendance.save!
-          
-          redirect_to new_user_attendance_path and return
-          flash.now[:success] = "変更しました"
-          
-        elsif item[:request_status] == 0
-          flash[:danger] = "指示者確認印が変更されていません"
-          render :overwork_confirm
         end
-      elsif item[:request_status] == 0
-        flash[:danger] = "残業承認をする時は「承認」または「否認」を選択してください"
-        
-      elsif item[:ok_flag] == "0"
-        flash[:danger] = "変更ボックスにチェックをつけてください"
+      # elsif item[:request_status] == 0
+      #   flash[:danger] = "残業承認をする時は「承認」または「否認」を選択してください"
 
-      elsif item[:request_status] == 8
-        flash[:info] = "「なし」を選択しました"
-        redirect_to new_user_attendance_path and return
+      # elsif item[:request_status] == 8
+      #   flash[:info] = "「なし」を選択しました"
+      #   redirect_to new_user_attendance_path and return
       end
       
     end
-    redirect_to new_user_attendance_path and return
+    flash[:success] = "残業申請の承認or否認の回答をしました"
+    redirect_to new_user_attendance_path
   end
   
   def month_confirmation #1ヶ月分の勤怠 承認画面

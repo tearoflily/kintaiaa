@@ -658,7 +658,7 @@ class AttendancesController < ApplicationController
   end
  
   def work_basic_edit
-  
+    @user = User.find(params[:user_id])
   end
  
  

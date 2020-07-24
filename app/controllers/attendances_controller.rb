@@ -10,8 +10,7 @@ class AttendancesController < ApplicationController
   before_action :set_select_who_consent, only: [:edit, :update_waiting]
 
 
-
-  def new #勤怠一覧画面
+  def new #勤怠一覧画面-
 
       who_consent_month_confirm = @attendances.pluck(:month_work_who_consent).uniq
       who_consent_edit_confirm = @attendances.pluck(:who_consent).uniq

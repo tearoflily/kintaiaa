@@ -1,11 +1,11 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now, :work_basic_edit, :update_waiting]
-  before_action :set_user, only:[:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :set_user, only:[:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_update]
   before_action :no_access_admin, only: [:new, :create, :edit, :update_waiting]
   
   before_action :logged_in_user
 
-  before_action :correct_user, only: [:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
+  before_action :correct_user, only: [:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_update]
   before_action :admin_user, only: [:working_now, :work_basic_edit]
   before_action :superior_user, only: [:edit_confirm, :update, :overwork_confirm, :overwork_confirm_update, :month_confirmation, :month_confirmation_update]
   before_action :set_select_who_consent, only: [:edit, :update_waiting]
@@ -590,30 +590,32 @@ class AttendancesController < ApplicationController
       update_month_edit_params.each do |key, item|
   
         item[:month_work] = item[:month_work].to_i
+        
+   
         if item[:ok_flag] == "0"
         elsif item[:month_work] == 1 && item[:ok_flag] == "1"
           
           @attendance_month = Attendance.find_by(id: key)
-          @user = User.find_by(id: @attendance_month.user_id)
+          @user_a = User.find_by(id: @attendance_month.user_id)
           @month_start = @attendance_month.worked_on.beginning_of_month
           @month_end = @month_start.end_of_month
-          @month = @user.attendances.where(worked_on: @month_start..@month_end)
+          @month = @user_a.attendances.where(worked_on: @month_start..@month_end)
           @month.each do | day |
             attendance = Attendance.find(day.id)
             attendance.month_work = 1
-            attendance.save!
+            attendance.save
           end
         elsif item[:month_work] == 2 && item[:ok_flag] == "1"
           @attendance_month = Attendance.find_by(id: key)
-          @user = User.find_by(id: @attendance_month.user_id)
+          @user_a = User.find_by(id: @attendance_month.user_id)
           @month_start = @attendance_month.worked_on.beginning_of_month
           @month_end = @month_start.end_of_month
-          @month = @user.attendances.where(worked_on: @month_start..@month_end)
+          @month = @user_a.attendances.where(worked_on: @month_start..@month_end)
           @month.each do | day |
      
             attendance = Attendance.find(day.id)
             attendance.month_work = 2
-            attendance.save!
+            attendance.save
 
           end
         elsif item[:month_work] == 0 && item[:ok_flag] == "1"
@@ -621,16 +623,16 @@ class AttendancesController < ApplicationController
 
         elsif item[:month_work] == 8 && item[:ok_flag] == "1"
           @attendance_month = Attendance.find_by(id: key)
-          @user = User.find_by(id: @attendance_month.user_id)
+          @user_a = User.find_by(id: @attendance_month.user_id)
           @month_start = @attendance_month.worked_on.beginning_of_month
           @month_end = @month_start.end_of_month
-          @month = @user.attendances.where(worked_on: @month_start..@month_end)
+          @month = @user_a.attendances.where(worked_on: @month_start..@month_end)
           @month.each do | day |
      
             attendance = Attendance.find(day.id)
             attendance.month_work = nil
             attendance.month_work_who_consent = nil
-            attendance.save!
+            attendance.save
           end
         end
       end

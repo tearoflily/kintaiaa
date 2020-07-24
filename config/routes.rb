@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   delete '/logout', to: 'sessions#destroy'
 
   resources :bases
-  
+  get '/work_basic_edit', to: 'attendances#work_basic_edit'
   get '/working_now', to: 'attendances#working_now'
   
   resources :users do
@@ -26,7 +26,7 @@ Rails.application.routes.draw do
                    get :edit_confirm
                    get :attendance_log
                    delete :attendance_log_delete
-                   get :work_basic_edit
+                   
                    post :overwork_confirm_update
                    get :overwork_confirm
                    patch :update

@@ -1,5 +1,5 @@
 class AttendancesController < ApplicationController
-  before_action :set_one_month, except: [:working_now]
+  before_action :set_one_month, except: [:working_now, :work_basic_edit]
   before_action :no_access_admin, only: [:new, :create, :edit, :update_waiting]
   
   before_action :logged_in_user
@@ -658,7 +658,7 @@ class AttendancesController < ApplicationController
   end
  
   def work_basic_edit
-    @user = User.find(params[:user_id])
+
   end
  
  

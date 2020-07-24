@@ -7,6 +7,11 @@ class ApplicationController < ActionController::Base
   def set_one_month
     @first_day = params[:date].nil? ?
     Date.current.beginning_of_month : params[:date].to_date
+    
+    if params[:day_id].present?
+      @first_day = params[:day_id].to_date.beginning_of_month
+    end
+    
     @last_day = @first_day.end_of_month
     one_month = [*@first_day..@last_day]
     
@@ -23,6 +28,8 @@ class ApplicationController < ActionController::Base
 
       
     end
+
+    @work_day_count = @attendances.where(only_day: 1).where.not(started_at:[nil,""]).count
     
   rescue ActiveRecord::RecordInvalid
       flash[:danger] = "ページ情報の取得に失敗しました。再度アクセスしてください"

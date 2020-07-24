@@ -70,7 +70,7 @@
                               			<td><%= day.note_temporary %></td>
                               			<td><%= atn.select :request_status, [['申請中', 0],['承認', 1],['否認', 2],['なし', 8]] %></td>
                               			<td class="active"><%= atn.check_box :ok_flag %></td>
-                              			<td><%= link_to '勤怠確認', new_user_attendance_path(day.user_id,'work_view'), class:"btn btn-primary" %></td>
+                              			<td><%= link_to '勤怠確認', new_user_attendance_path(day.user_id, format: 'work_view', day_id: day.worked_on), class:"btn btn-primary" %></td>
                               	     </tr>
                               	     <% end %>
                               	   <% end %>

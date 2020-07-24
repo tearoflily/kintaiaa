@@ -51,30 +51,55 @@
 			  			<td><%= l(day.worked_on, format: :short) %></td>
 			  			<td><%= $days_of_the_week[day.worked_on.wday] %></td>
 			  			<td>
-			  				<% if day.request_status == 0 %>
-			  					<%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true, :disabled => true, selected: day.started_at, include_blank: true} %></td>
-								<% else %>
-									<%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true, selected: day.started_at, include_blank: true} %>
+			  				<% if day.worked_on > Date.current %>
+				  				<% if day.request_status == 0 %>
+				  					<%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true, :disabled => true, selected: day.started_at, include_blank: true, :disabled => true} %></td>
+									<% else %>
+										<%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true, selected: day.started_at, include_blank: true, :disabled => true} %>
+									<% end %>
+				  			<% else %>	
+				  				<% if day.request_status == 0 %>
+				  					<%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true, :disabled => true, selected: day.started_at, include_blank: true} %></td>
+									<% else %>
+										<%= attendance.datetime_select :after_started_at, { :discard_year => true,  :discard_month => true, :discard_day => true, selected: day.started_at, include_blank: true} %>
+									<% end %>
 								<% end %>
 			  			<td>
-			  				<%= attendance.datetime_select :after_finished_at, { :discard_year => true,  :discard_month => true, :discard_day => true , selected: day.finished_at, include_blank: true } %></td>
-			
+			  				<% if day.worked_on > Date.current %>
+			  					<%= attendance.datetime_select :after_finished_at, { :discard_year => true,  :discard_month => true, :discard_day => true , selected: day.finished_at, include_blank: true,:disabled => true} %></td>
+								<% else %>
+									<%= attendance.datetime_select :after_finished_at, { :discard_year => true,  :discard_month => true, :discard_day => true , selected: day.finished_at, include_blank: true} %></td>
+								<% end %>
 			  			<td>
-			  		
-			  			<% if day.tommorow == "1" %>
-			  				<%= attendance.check_box :tommorow_flag, {checked: true} %>
-			  			<% elsif day.tommorow == "0" ||  day.tommorow == nil %>
-			  				<%= attendance.check_box :tommorow_flag, {checked: false} %>
-			  			<% end %>
+			  				<% if day.worked_on > Date.current %>
+					  			<% if day.tommorow == "1" %>
+					  				<%= attendance.check_box :tommorow_flag, {checked: true,:disabled => true} %>
+					  			<% elsif day.tommorow == "0" ||  day.tommorow == nil %>
+					  				<%= attendance.check_box :tommorow_flag, {checked: false,:disabled => true} %>
+					  			<% end %>
+					  		<% else %>	
+					  			<% if day.tommorow == "1" %>
+					  				<%= attendance.check_box :tommorow_flag, {checked: true} %>
+					  			<% elsif day.tommorow == "0" ||  day.tommorow == nil %>
+					  				<%= attendance.check_box :tommorow_flag, {checked: false} %>
+					  			<% end %>
+					  		<% end %>	
 			  			</td>
 			  			<td></td>
 			  			<td>
+			  				<% if day.worked_on > Date.current %>
+			  			  	<%= attendance.text_field :note_temporary, value:day.note,:disabled => true %>
+			  			  <% else %>
 			  			  <%= attendance.text_field :note_temporary, value:day.note %>
+			  			  <% end %>
 			  			</td>
 			  			
 			  			<td>
-			  				<%= attendance.collection_select :who_consent, @select_attendance, :id, :name, {include_blank: '選択してください' }, :prompt => true %> 
-			  
+			  				<% if day.worked_on > Date.current %>
+				  				<%= attendance.collection_select :who_consent, @select_attendance, :id, :name, {include_blank: '選択してください' }, :prompt => true,:disabled => true %> 
+			  				<% else %>
+			  					<%= attendance.collection_select :who_consent, @select_attendance, :id, :name, {include_blank: '選択してください' }, :prompt => true %> 
+			  				<% end %>
 			  			</td>
 						<% end %>
 					<% end %>

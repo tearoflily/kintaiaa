@@ -27,7 +27,7 @@
 			<td>氏名：<%= @user.name %></td>
 			<td>コード</td>
 			<td><%= @user.uid %></td>
-			<td>出勤日数</td>
+			<td>出勤日数：<%= @work_day_count %></td>
 			<td>締め：<%= l(@first_day.end_of_month, format: :short) %></td>
 		</tr>
 	</tbody>
@@ -121,7 +121,7 @@
 			<th>時</th>
 			<th>分</th>
 		</tr>
-		
+	
 	<% @attendances.each do |day| %>
 			<% if day.only_day == 1 %>
 				<% if params[:format].nil? %>
@@ -200,7 +200,7 @@
 			<% if params[:format].nil? %>
 			
 				<% if @attendances.first.month_work == nil %>
-						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
+						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: current_user.id, dayid: @first_day), local: true, method: :post) do |f| %>
 							<div>所属長承認</div>
 							<div><%= f.collection_select :month_work_who_consent, User.where(superior: true).where.not(id: current_user.id).where.not(admin: true), :id, :name, {include_blank: '選択' }, :prompt => true %> </div>
 							<div><%= f.submit "申請", class:"btn btn-primary" %></div>
@@ -210,7 +210,7 @@
 				<% elsif @attendances.first.month_work == 1 %>
 					<%= month_who_confirm(@attendances.first.month_work_who_consent) %><br>所属長承認：承認済み
 				<% elsif (@attendances.first.month_work == 2) %>
-						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: params[:user_id], dayid: @first_day), local: true, method: :post) do |f| %>
+						<%= form_with(model: @attendance_month_work, url: month_confirmation_create_user_attendances_path(user_id: current_user.id, dayid: @first_day), local: true, method: :post) do |f| %>
 							<div>所属長承認</div>
 							<div><%= f.collection_select :month_work_who_consent, User.where(superior: true).where.not(id: current_user.id).where.not(admin: true), :id, :name, {include_blank: '選択' }, :prompt => true %> </div>
 							<div><%= f.submit "再度申請", class:"btn btn-primary" %></div>

@@ -46,6 +46,7 @@ class ApplicationController < ActionController::Base
   end
   
   def correct_user
+   
     unless current_user?(@user)
         flash[:danger] = "ログイン中のユーザー自身の勤怠画面のみ表示可能です。"
         redirect_to root_url

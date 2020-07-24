@@ -1,5 +1,6 @@
 class AttendancesController < ApplicationController
   before_action :set_one_month, except: [:working_now, :work_basic_edit, :update_waiting]
+  before_action :set_user, only:[:create, :attendance_log, :month_confirmation_create, :attendance_log_delete, :edit, :update_waiting, :overwork, :overwork_update, :month_confirmation_create]
   before_action :no_access_admin, only: [:new, :create, :edit, :update_waiting]
   
   before_action :logged_in_user
@@ -704,6 +705,11 @@ class AttendancesController < ApplicationController
         flash[:danger] = "編集権限がありません。"
         redirect_to root_url
       end
+    end
+    
+    
+    def set_user
+      @user = User.find(params[:user_id])
     end
     
 end

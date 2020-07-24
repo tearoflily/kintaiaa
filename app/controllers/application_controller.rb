@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
       
     end
 
-    @work_day_count = @attendances.where(only_day: 1).where.not(started_at:[nil,""]).count
+    @work_day_count = @attendances.where(only_day: 1).where('started_at IS NOT NULL').count
     
   rescue ActiveRecord::RecordInvalid
       flash[:danger] = "ページ情報の取得に失敗しました。再度アクセスしてください"

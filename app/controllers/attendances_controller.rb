@@ -135,6 +135,7 @@ class AttendancesController < ApplicationController
   
   def edit #勤怠編集画面
     @attendance = @user.attendances.find_by(user_id: current_user.id)
+    @user = User.find(params[:user_id])
   end
   
   def set_select_who_consent

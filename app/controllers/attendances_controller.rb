@@ -571,12 +571,12 @@ class AttendancesController < ApplicationController
   def month_confirmation #1ヶ月分の勤怠 承認画面
       @attendance_month = Attendance.where(month_work_who_consent: current_user.id).where(month_work: 0)
       @attendance_user_id = @attendance_month.pluck(:user_id)
-      @user = User.new
+      @user_b = User.new
      
       @users = {}
       @attendance_user_id.each do |user|
-        @user = User.find_by(id: user)
-        @user_attendance = @user.attendances.where(month_work_who_consent: current_user.id).where(month_work: 0).first
+        @user_b = User.find_by(id: user)
+        @user_attendance = @user_b.attendances.where(month_work_who_consent: current_user.id).where(month_work: 0).first
 
         
         @users.merge!(user => @user_attendance)

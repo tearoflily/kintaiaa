@@ -50,10 +50,24 @@ module AttendancesHelper
   end
   
   
-  def month_confirm_count(id)
- 
-    count_attendance = Attendance.where(month_work_who_consent: id).where(month_work: 0)
-    uniq_user = count_attendance.pluck(:user_id).uniq.count
+  def month_confirm_count(who_id)
+
+    user_attendance = Attendance.where(month_work_who_consent: who_id).where(month_work: 0) #勤怠情報から条件と一致するレコードを取得
+    ua = user_attendance.pluck(:user_id).uniq #取得したレコードの中でuser_idカラムを取得。
+    uniq_user = 0
+    ua.each do |user_uniq|
+      # 3,5それぞれをeachで回す。まずは3
+      user_a = User.find(user_uniq)
+      uniq_user_month = user_a.attendances.where(month_work_who_consent: who_id).where(month_work: 0)
+      #3の全ての勤怠情報の中から、合致するものを抽出する
+      u_count = uniq_user_month.pluck(:worked_on).map(&:beginning_of_month).uniq.count
+      
+      uniq_user += u_count.to_i
+      
+    end
+    # count_attendance = Attendance.where(month_work_who_consent: id).where(month_work: 0)
+    # uniq_user = count_attendance.pluck(:user_id).uniq.count
+
     return uniq_user
   end
   

@@ -570,18 +570,25 @@ class AttendancesController < ApplicationController
   
   def month_confirmation #1ヶ月分の勤怠 承認画面
       @attendance_month = Attendance.where(month_work_who_consent: current_user.id).where(month_work: 0)
-      @attendance_user_id = @attendance_month.pluck(:user_id)
-      @user_b = User.new
+      @attendance_user_id = @attendance_month.pluck(:user_id).uniq
+      @user_new = User.new
      
       @users = {}
       @attendance_user_id.each do |user|
-        @user_b = User.find_by(id: user)
-        @user_attendance = @user_b.attendances.where(month_work_who_consent: current_user.id).where(month_work: 0).first
+        @user_b = User.find_by(id: user) #一人目ののユーザー特定
+        user_attendance = @user_b.attendances.where(month_work_who_consent: current_user.id).where(month_work: 0) # その人を指名した勤怠情報を格納(日付単位で複数)
+        @user_attendance = user_attendance.pluck(:worked_on).map(&:beginning_of_month).uniq #レコードを月初のものだけに絞る。月の最初の日(複数なら複数格納)
+        @at = @user_b.attendances.where(worked_on: @user_attendance).where(only_day: 1) #上記コードの勤怠情報を取得する
+  
+        
+    
+         @users.merge!(user => @at)
+          # @users.merge!(user => item)
 
-        
-        @users.merge!(user => @user_attendance)
-        
       end
+      
+     
+
   end
   
   def month_confirmation_update #1ヶ月分の勤怠承認処理
@@ -619,7 +626,7 @@ class AttendancesController < ApplicationController
 
           end
         elsif item[:month_work] == 0 && item[:ok_flag] == "1"
-          flash[:danger] = "「承認」or「否認」を選択してください"
+       
 
         elsif item[:month_work] == 8 && item[:ok_flag] == "1"
           @attendance_month = Attendance.find_by(id: key)

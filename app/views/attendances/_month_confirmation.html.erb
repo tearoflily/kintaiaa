@@ -12,10 +12,10 @@
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
    
-   
+
 
           <% if @users.present? %>
-            <%= form_with(model: @user, url: month_confirmation_update_user_attendances_path(@user.id), local: true, method: :patch) do |f| %>
+            <%= form_with(model: @user_new, url: month_confirmation_update_user_attendances_path(current_user.id), local: true, method: :patch) do |f| %>
             
                     <% @users.each do |key, attendances| %>
                     
@@ -28,18 +28,19 @@
                         			<th class="active">変更</th>
                         			<th>指示確認印</th>
                         		</tr>
-                        	
-                        		
-                                    <%= f.fields_for "attendances[]", attendances do |attendance| %>
+                        	    
+                        	  
+                        	     
+                        	      <% attendances.each do |day| %>
+                                    <%= f.fields_for "attendances[]", day do |atn| %>
                                         <tr> 
-                                			<td><%= attendance.hidden_field :month, :value => attendances.worked_on %><%= attendances.worked_on.strftime('%-m月') %></td>
-                                			<td><%= attendance.select :month_work, [['申請中', 0],['承認', 1],['否認', 2],['なし', 8]] %></td>
-                                			<td class="active"><%= attendance.check_box :ok_flag %></td>
-                                			<td><%= link_to '勤怠確認', new_user_attendance_path(key, format: 'work_view', day_id: attendances.worked_on), class:"btn btn-primary" %></td>
+                                			<td><%= atn.hidden_field :month, :value => day.worked_on %><%= day.worked_on.strftime('%-m月') %></td>
+                                			<td><%= atn.select :month_work, [['申請中', 0],['承認', 1],['否認', 2],['なし', 8]] %></td>
+                                			<td class="active"><%= atn.check_box :ok_flag %></td>
+                                			<td><%= link_to '勤怠確認', new_user_attendance_path(key, format: 'work_view', day_id: day.worked_on), class:"btn btn-primary" %></td>
                                         </tr>
                                     <% end %> 
-                                
-                        	
+                                <% end %>
                         	</tbody>
                         </table>
                         
